@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RAG Project Config",
+  "type": "object",
+  "properties": {
+    "chunkSize": { "type": "integer", "minimum": 1 },
+    "chunkOverlap": { "type": "integer", "minimum": 0 },
+    "topK": { "type": "integer", "minimum": 1 },
+    "embeddingModel": { "type": "string" },
+    "chatModel": { "type": "string" },
+    "dataPath": { "type": "string" },
+    "indexPath": { "type": "string" }
+  },
+  "required": [
+    "chunkSize",
+    "chunkOverlap",
+    "topK",
+    "embeddingModel",
+    "chatModel",
+    "dataPath",
+    "indexPath"
+  ],
+  "additionalProperties": false
+}
+
+

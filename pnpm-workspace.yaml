@@ -1,0 +1,9 @@
+packages:
+  - "apps/*"
+  - "services/*"
+  - "workers/*"
+  - "projects/*"
+  - "shared/*/*"
+  - "tools/*"
+
+

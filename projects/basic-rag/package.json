@@ -1,0 +1,16 @@
+{
+  "name": "basic-rag",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint \"src/**/*.ts\"",
+    "test": "echo \"No tests yet\"",
+    "ingest": "ts-node src/ingest.ts",
+    "query": "ts-node src/query.ts"
+  }
+}
+
+

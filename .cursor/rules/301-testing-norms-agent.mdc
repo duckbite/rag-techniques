@@ -1,0 +1,41 @@
+---
+description: When modifying code or adding functionality, ensure comprehensive test coverage by running existing tests and creating new unit tests. Apply this rule when making code changes, adding features, refactoring, or implementing new functionality to maintain code quality and prevent regressions.
+globs:
+alwaysApply: false
+tags: [testing, quality, coverage, unit-tests]
+priority: 2
+---
+
+# Testing Norms
+
+## Context
+
+- When modifying existing code or specifications
+- When adding new functionality or features
+- When refactoring or restructuring code
+
+## Requirements
+
+- Run existing tests after any code modification
+- Create unit tests for all new functionality
+- Consult user if tests fail after modifications
+- Ensure test coverage for changed code paths
+
+## Examples
+
+<example>
+Good: After adding a new API endpoint, run existing API tests and create unit tests for the new endpoint functionality
+</example>
+
+<example type="invalid">
+Bad: Adding new features without creating corresponding unit tests or running existing test suite
+</example>
+
+## Critical Points
+
+<critical>
+  - ALWAYS run tests after code modifications
+  - ALWAYS create unit tests for new functionality
+  - ALWAYS consult user if tests fail
+  - ENSURE test coverage matches code changes
+</critical>

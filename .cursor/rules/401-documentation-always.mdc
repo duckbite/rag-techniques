@@ -1,0 +1,11 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+use the following project documentation and use it thoroughly:
+
+- @docs/project-structure.md - write a human (and machine) readable folder structure with descriptions of the files and folders in it. This will help you find the right files. You always update this file when new files are added or removed, or when the goal of a file changes.
+- README.md - Describe how to use the application. So the user can easily run, test, and deploy the application without AI if needed.
+- When working on a linear (mcp) ticket, leave a comment on how the solution was made and which files were modified.

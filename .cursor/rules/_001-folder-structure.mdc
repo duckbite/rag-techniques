@@ -1,0 +1,41 @@
+---
+description: folder structure to use when scaffolding the application
+globs:
+alwaysApply: true
+---
+
+- Each app or shared library in its own folder
+- Store test with the code
+
+## Folder Structure (authorative)
+
+```
+repo-root/
+├─ projects/ # create a folder per sub project here
+├─ shared/ # All shared code/assets by type/language
+│ ├─ typescript/
+│ │ ├─ ui/ # React component lib (example)
+│ │ └─ utils/ # TS utilities
+│ ├─ schemas/ # OpenAPI/GraphQL/JSON Schema, language-agnostic
+│ │ ├─ openapi/
+│ │ ├─ graphql/
+│ │ └─ jsonschema/
+│ ├─ protos/ # Protobuf IDL (optional)
+│ ├─ sql/ # Reusable SQL (views/functions)
+│ └─ assets/ # Logos/fonts/copy/etc.
+├─ tools/ # Codegen, release, misc scripts
+│ ├─ codegen/
+│ └─ release/
+├─ infra/ # IaC / deploy / Docker (optional)
+│ ├─ k8s/
+│ ├─ terraform/
+│ └─ docker/
+├─ .github/ # CI, CODEOWNERS
+├─ .vscode/ # Editor settings
+├─ turbo.json
+├─ pnpm-workspace.yaml
+├─ package.json # Root scripts only (no runtime deps)
+├─ tsconfig.base.json # If using TS
+├─ .editorconfig
+└─ .env.example
+```

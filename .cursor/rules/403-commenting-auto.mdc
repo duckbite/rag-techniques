@@ -1,0 +1,45 @@
+---
+description:
+globs: **/src/**
+alwaysApply: false
+---
+
+# Commenting Policy
+
+## Context
+
+- Apply whenever adding/modifying code, during PR reviews, and when documenting edge cases or architectural tradeoffs.
+- Use this rule to prevent incomplete markers (e.g. TODOs) and eliminate obvious/noise comments.
+
+## Requirements
+
+- Write comments only when they add non-obvious context: intent, rationale, invariants, constraints, or edge cases.
+- Explain “why” over “what.” Code should make the “what” clear.
+- Prohibit incomplete work markers (e.g. TODO, FIXME, TBD) in committed code. Implement now or open a tracked issue and reference it.
+- Document non-trivial algorithms, performance implications, security considerations, and protocol or API contracts.
+- Keep comments concise, up-to-date, and placed near the relevant code. Delete stale comments when code changes.
+- Prefer precise terminology; avoid redundancy with names. If a comment repeats the code, remove it or rename identifiers for clarity.
+- For public APIs, document inputs, outputs, errors, and side effects where not self-evident.
+- Use code comments, not commit messages, to capture local invariants. Use ADRs or architecture docs for system-wide decisions.
+
+## Examples
+
+<example>
+Good: Explains rationale and constraints.
+// Avoids N^2 by caching lookups; input size can exceed 50k items in prod
+// Keys are case-insensitive due to upstream API contract
+</example>
+
+<example type="invalid">
+Invalid: Obvious or incomplete.
+// increment i by 1
+// TODO: handle errors
+</example>
+
+## Critical Points
+
+<critical>
+  - ALWAYS document non-obvious intent, invariants, and tradeoffs.
+  - NEVER commit TODO/FIXME/TBD or placeholder comments; replace with code or an issue link.
+  - ENSURE comments stay accurate; update or remove when code changes.
+</critical>

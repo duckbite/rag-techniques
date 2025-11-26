@@ -1,0 +1,8 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+- Before writing any code, make sure the requirements for the feature are clear. If not, ask the user to specify details. Log any updated specifications to docs/product.md doc.
+- align on the technical implementation with the user before writing any code. Your user is a developer and would like to gate-keep these decisions.

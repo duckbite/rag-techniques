@@ -1,0 +1,22 @@
+{
+  "name": "rag-techniques-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "scripts": {
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "test": "turbo test",
+    "basic-rag:ingest": "pnpm --filter basic-rag run ingest",
+    "basic-rag:query": "pnpm --filter basic-rag run query"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0",
+    "typescript": "^5.6.0",
+    "@types/node": "^22.0.0",
+    "eslint": "^9.0.0",
+    "ts-node": "^10.9.2"
+  }
+}
+
+

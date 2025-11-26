@@ -1,0 +1,37 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+# Monorepo Rules (Turborepo + Language-Agnostic Shared Code)
+
+## Goals
+
+- Single monorepo for one project with many deployables (apps, services, workers).
+- Language-agnostic structure with shared code under `shared/<language>/*`.
+- Fast, incremental builds via Turborepo; consistent DX across languages.
+- Strict boundaries: deployables don’t import other deployables; only shared libs.
+
+---
+
+**Enforcement**
+
+- New deployables go under `apps/`, `services/`, or `workers/`.
+- Shared code must live inside `shared/…` with a clear, language-specific home.
+- Do not create ad-hoc `common/` folders outside `shared/`.
+
+---
+
+## Workspace & Discovery
+
+**pnpm-workspace.yaml**
+
+```yaml
+packages:
+  - 'apps/*'
+  - 'services/*'
+  - 'workers/*'
+  - 'shared/*/*' # e.g., shared/typescript/*, shared/python/*
+  - 'tools/*'
+```
