@@ -7,9 +7,13 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "lint": "eslint \"src/**/*.ts\"",
-    "test": "echo \"No tests yet\"",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
     "ingest": "ts-node src/ingest.ts",
     "query": "ts-node src/query.ts"
+  },
+  "devDependencies": {
+    "vitest": "^4.0.14"
   }
 }
 

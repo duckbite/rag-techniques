@@ -7,8 +7,16 @@ This document describes the high-level folder layout for the TypeScript RAG Tech
   - `project-structure.md` – This file; documents repository layout.
 - `projects/`
   - `basic-rag/` – Reference implementation of a simple RAG pipeline.
+    - `.tmp/` – Project-local runtime artifacts (vector indexes, evaluation outputs). Folder tracked via `.gitkeep`, contents ignored.
+    - `vitest.config.ts` – Vitest configuration and coverage output path definitions.
+    - `src/`
+      - `__tests__/` – Vitest unit tests (e.g., `ingest.test.ts`, `query.test.ts`) covering ingestion/query helpers.
+      - `ingest.ts` – Document ingestion pipeline.
+      - `query.ts` – Interactive CLI for querying the vector index.
   - `rerank/` – RAG with reranking of retrieved documents.
   - `query-rewrite/` – RAG variants that rewrite or expand queries before retrieval.
+- `logs/`
+  - `decision-log.md` – Running record of cross-cutting decisions (runtime data location, documentation requirements, sample data usage, etc.).
 - `shared/`
   - `typescript/`
     - `utils/` – Shared TypeScript utilities:
