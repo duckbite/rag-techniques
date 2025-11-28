@@ -5,6 +5,7 @@ This document describes the high-level folder layout for the TypeScript RAG Tech
 - `docs/`
   - `product.md` – Product and roadmap description.
   - `project-structure.md` – This file; documents repository layout.
+  - `plan.md` – Rolling implementation plan that tracks technique parity status.
 - `projects/`
   - `basic-rag/` – Reference implementation of a simple RAG pipeline.
     - `.tmp/` – Project-local runtime artifacts (vector indexes, evaluation outputs). Folder tracked via `.gitkeep`, contents ignored.

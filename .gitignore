@@ -31,4 +31,4 @@ coverage
 # tools/source/ is a folder for source code of tools that are not part of the project
 tools/source/**
 
-
+.tmp
