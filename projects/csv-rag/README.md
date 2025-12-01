@@ -10,6 +10,32 @@ CSV RAG ports the “simple CSV RAG” notebook from the original NirDiamant rep
 
 It is ideal whenever you have lightweight tabular exports (finance summaries, experiment trackers, product roadmaps) and you want transparent answers that show which row was used.
 
+## What Makes This Project Unique
+
+**CSV RAG** extends basic RAG to handle structured tabular data. Its uniqueness lies in:
+
+- **Automatic column inference**: Automatically detects which CSV columns contain searchable text vs. structured metadata, eliminating the need to manually specify column types for most CSVs.
+- **Dual-purpose columns**: Text columns are embedded and searched semantically, while metadata columns are preserved for filtering, display, and structured queries without being embedded.
+- **Row-to-document mapping**: Each CSV row becomes a document, making it easy to trace answers back to specific rows and their metadata.
+
+### How the Unique Concepts Work
+
+1. **Column type inference**: The system analyzes CSV rows to determine which columns contain alphabetic characters (text) vs. purely numeric/categorical data (metadata). This is controlled by the `inferTextColumns()` function, which can be overridden via `textColumns` in the config.
+
+2. **Content + metadata separation**: Text columns are formatted as "ColumnName: value" and embedded, while metadata columns are stored separately in chunk metadata. This allows semantic search over text while preserving structured data for programmatic use.
+
+3. **Metadata preservation**: During retrieval, both the embedded text content and the original row metadata are available, allowing the LLM to reference specific values (e.g., "Company X had revenue of $1M in 2023") and enabling post-retrieval filtering.
+
+### How to Adjust for Different Use Cases
+
+- **For CSVs with mixed text/numeric columns**: Let auto-inference work, or manually specify `textColumns` if the heuristic misclassifies (e.g., if a numeric column like "Year" should be searchable text).
+
+- **For CSVs with many metadata columns**: Explicitly set `metadataColumns` to control which columns are shown during querying, reducing noise in the prompt.
+
+- **For very wide CSVs**: Consider specifying only the most important text columns in `textColumns` to focus embedding on the most relevant content and reduce token usage.
+
+- **For CSVs with long text fields**: Adjust `chunkSize` and `chunkOverlap` to handle multi-paragraph notes or descriptions within single rows.
+
 ## Configuration
 
 All settings live in `config/csv-rag.config.json`:

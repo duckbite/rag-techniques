@@ -155,10 +155,30 @@ export async function answerCsvQuestion(
   const chatClient = deps.chatClient ?? new OpenAIChatClient();
   const store = deps.vectorStore ?? loadInMemoryVectorStore(cfg.indexPath);
 
+  logger.info("Processing CSV query", { question: trimmed, topK: cfg.topK });
   const [queryEmbedding] = await embeddingClient.embed([trimmed]);
+  logger.info("Generated query embedding", { dimension: queryEmbedding.length });
+
   const retrieved = store.search(queryEmbedding, cfg.topK);
+  logger.info("Retrieved CSV chunks", {
+    count: retrieved.length,
+    scores: retrieved.map((c) => c.score.toFixed(3)),
+    rowIndices: retrieved.map((c) => c.metadata?.rowIndex ?? "N/A")
+  });
+
   const prompt = buildCsvPrompt(trimmed, retrieved);
+  logger.info("Built prompt", {
+    promptLength: prompt.length,
+    contextChunks: retrieved.length
+  });
+
+  logger.info("Generating answer", { chatModel: cfg.chatModel });
   const answer = await chatClient.chat([{ role: "user", content: prompt }], cfg.chatModel);
+  logger.info("Generated answer", {
+    answerLength: answer.length,
+    topScore: retrieved.length > 0 ? retrieved[0].score.toFixed(3) : "N/A"
+  });
+
   return { answer, retrieved, prompt };
 }
 
@@ -184,13 +204,19 @@ async function interactiveQuery(): Promise<void> {
   while (true) {
     const question = (await ask("> ")).trim();
     if (!question || question.toLowerCase() === "exit") break;
-    const { answer } = await answerCsvQuestion(question, cfg, {
+    const { answer, retrieved } = await answerCsvQuestion(question, cfg, {
       embeddingClient,
       chatClient,
       vectorStore: store
     });
     // eslint-disable-next-line no-console
     console.log("\nAnswer:\n", answer, "\n");
+    logger.info("Query summary", {
+      question,
+      chunksRetrieved: retrieved.length,
+      topScore: retrieved.length > 0 ? retrieved[0].score.toFixed(3) : "N/A",
+      answerGenerated: answer.length > 0
+    });
   }
 
   rl.close();

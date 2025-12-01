@@ -321,12 +321,53 @@ export async function answerReliableQuestion(
   const chatClient = deps.chatClient ?? new OpenAIChatClient();
   const store = deps.vectorStore ?? loadInMemoryVectorStore(cfg.indexPath);
 
+  logger.info("Processing reliable query", {
+    question: trimmed,
+    topK: cfg.topK,
+    relevanceThreshold: cfg.relevanceThreshold
+  });
   const [queryEmbedding] = await embeddingClient.embed([trimmed]);
+  logger.info("Generated query embedding", { dimension: queryEmbedding.length });
+
   const retrieved = store.search(queryEmbedding, cfg.topK);
-  const validated = validateRetrievedChunks(trimmed, retrieved, cfg).filter((chunk) => chunk.isRelevant);
-  const chunksForPrompt = validated.length > 0 ? validated : validateRetrievedChunks(trimmed, retrieved, cfg).slice(0, 1);
+  logger.info("Retrieved candidate chunks", {
+    count: retrieved.length,
+    scores: retrieved.map((c) => c.score.toFixed(3))
+  });
+
+  const allValidated = validateRetrievedChunks(trimmed, retrieved, cfg);
+  const validated = allValidated.filter((chunk) => chunk.isRelevant);
+  logger.info("Validation results", {
+    totalRetrieved: retrieved.length,
+    validatedCount: validated.length,
+    rejectedCount: retrieved.length - validated.length,
+    validationDetails: allValidated.map((c) => ({
+      score: c.score.toFixed(3),
+      overlap: c.overlap.toFixed(2),
+      isRelevant: c.isRelevant
+    }))
+  });
+
+  const chunksForPrompt = validated.length > 0 ? validated : allValidated.slice(0, 1);
+  if (validated.length === 0) {
+    logger.warn("No chunks passed validation; using top chunk as fallback", {
+      fallbackScore: chunksForPrompt[0]?.score.toFixed(3)
+    });
+  }
+
   const prompt = buildReliablePrompt(trimmed, chunksForPrompt);
+  logger.info("Built prompt with validated chunks", {
+    promptLength: prompt.length,
+    validatedChunksInPrompt: chunksForPrompt.length
+  });
+
+  logger.info("Generating answer", { chatModel: cfg.chatModel });
   const answer = await chatClient.chat([{ role: "user", content: prompt }], cfg.chatModel);
+  logger.info("Generated answer", {
+    answerLength: answer.length,
+    validatedChunksUsed: chunksForPrompt.length,
+    topScore: chunksForPrompt.length > 0 ? chunksForPrompt[0].score.toFixed(3) : "N/A"
+  });
 
   return { answer, validatedChunks: chunksForPrompt, prompt };
 }
@@ -349,13 +390,22 @@ async function interactiveQuery(): Promise<void> {
   while (true) {
     const question = (await ask("> ")).trim();
     if (!question || question.toLowerCase() === "exit") break;
-    const { answer } = await answerReliableQuestion(question, cfg, {
+    const { answer, validatedChunks } = await answerReliableQuestion(question, cfg, {
       embeddingClient,
       chatClient,
       vectorStore: store
     });
     // eslint-disable-next-line no-console
     console.log("\nAnswer:\n", answer, "\n");
+    logger.info("Query summary", {
+      question,
+      chunksRetrieved: validatedChunks.length,
+      validatedCount: validatedChunks.filter((c) => c.isRelevant).length,
+      topScore: validatedChunks.length > 0 ? validatedChunks[0].score.toFixed(3) : "N/A",
+      topOverlap:
+        validatedChunks.length > 0 ? validatedChunks[0].overlap.toFixed(2) : "N/A",
+      answerGenerated: answer.length > 0
+    });
   }
 
   rl.close();

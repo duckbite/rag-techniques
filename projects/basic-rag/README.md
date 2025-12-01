@@ -12,6 +12,29 @@ This project implements a foundational Retrieval-Augmented Generation (RAG) syst
 
 This is the simplest RAG implementation and serves as the baseline for understanding more advanced techniques in other projects.
 
+## What Makes This Project Unique
+
+**Basic RAG** is the foundational RAG pattern that all other projects build upon. Its uniqueness lies in its simplicity and directness:
+
+- **Direct chunk-to-embedding mapping**: Each document chunk is embedded exactly once and stored as-is. There's no transformation, validation, or filtering beyond the initial chunking.
+- **Pure semantic retrieval**: Uses only cosine similarity between query and chunk embeddings. No lexical matching, no validation gates, no post-processing.
+- **Straightforward prompt construction**: Retrieved chunks are formatted and sent directly to the LLM with minimal prompt engineering.
+
+### How the Core Concepts Work
+
+1. **Fixed-size chunking with overlap**: Documents are split into fixed-size chunks (e.g., 800 characters) with overlap (e.g., 200 characters) to prevent information loss at boundaries. This is controlled by `chunkSize` and `chunkOverlap` in the config.
+
+2. **Cosine similarity retrieval**: When a query comes in, it's embedded and compared to all stored chunk embeddings using cosine similarity. The top-K chunks (controlled by `topK`) with highest similarity scores are retrieved.
+
+3. **Context-augmented generation**: Retrieved chunks are formatted into a prompt that instructs the LLM to answer based only on the provided context, preventing hallucination.
+
+### How to Adjust for Different Use Cases
+
+- **For longer documents**: Increase `chunkSize` (e.g., 1200-1600) to preserve more context per chunk, but be aware this may include more irrelevant text.
+- **For precise retrieval**: Decrease `chunkSize` (e.g., 400-600) for more focused chunks, but ensure overlap is sufficient (10-25% of chunk size) to avoid losing information at boundaries.
+- **For better recall**: Increase `topK` (e.g., 5-8) to retrieve more chunks, giving the LLM more context but potentially including less relevant information.
+- **For better precision**: Decrease `topK` (e.g., 2-3) to retrieve only the most relevant chunks, but risk missing important context.
+
 ## What This Project Demonstrates
 
 - **Document Processing**: Reading text files and splitting them into chunks with configurable size and overlap

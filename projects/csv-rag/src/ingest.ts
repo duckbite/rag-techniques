@@ -314,12 +314,20 @@ export async function runCsvIngestion(
   const embeddingClient = deps.embeddingClient ?? new OpenAIEmbeddingClient(cfg.embeddingModel);
   const vectorStore = deps.vectorStore ?? new InMemoryVectorStore();
 
+  logger.info("Loading CSV file", { csvPath: cfg.csvPath, delimiter: cfg.delimiter ?? "," });
   const rows = loadRows(path.resolve(cfg.csvPath), { delimiter: cfg.delimiter });
+  logger.info("Loaded CSV rows", { rowCount: rows.length });
+
   if (rows.length === 0) {
     logger.warn("CSV contained no rows; persisting empty index", { csvPath: cfg.csvPath });
     vectorStore.persist(cfg.indexPath);
     return { documents: [], chunks: [] };
   }
+
+  logger.info("Inferring column types", {
+    hasTextColumnsOverride: Boolean(cfg.textColumns),
+    hasMetadataColumnsOverride: Boolean(cfg.metadataColumns)
+  });
   const textColumns = inferTextColumns(rows, cfg.textColumns);
   const metadataColumns = inferMetadataColumns(rows, textColumns, cfg.metadataColumns);
 
@@ -327,15 +335,33 @@ export async function runCsvIngestion(
     throw new Error("Unable to determine text columns. Specify `textColumns` in config.");
   }
 
-  logger.info("CSV stats", {
-    csvPath: cfg.csvPath,
+  logger.info("Column inference complete", {
+    textColumns,
+    metadataColumns,
+    totalColumns: textColumns.length + metadataColumns.length
+  });
+
+  logger.info("Building documents from CSV rows", {
     rowCount: rows.length,
     textColumns,
     metadataColumns
   });
-
   const documents = buildDocumentsFromRows(rows, textColumns, metadataColumns);
+  logger.info("Created documents from rows", {
+    documentCount: documents.length,
+    filteredOut: rows.length - documents.length
+  });
+
+  logger.info("Chunking documents", {
+    chunkSize: cfg.chunkSize,
+    chunkOverlap: cfg.chunkOverlap
+  });
   const chunks = documents.flatMap((doc) => chunker(doc, cfg));
+  logger.info("Created chunks", {
+    chunkCount: chunks.length,
+    averageChunksPerDocument:
+      documents.length > 0 ? (chunks.length / documents.length).toFixed(2) : 0
+  });
 
   if (chunks.length === 0) {
     logger.warn("No chunks produced from CSV rows; persisting empty index");
@@ -343,9 +369,21 @@ export async function runCsvIngestion(
     return { documents, chunks };
   }
 
+  logger.info("Generating embeddings", {
+    model: cfg.embeddingModel,
+    chunkCount: chunks.length
+  });
   const embeddings = await embedChunks(chunks, embeddingClient);
+  logger.info("Generated embeddings", {
+    count: embeddings.length,
+    dimension: embeddings[0]?.length ?? 0
+  });
+
+  logger.info("Storing chunks and embeddings in vector store");
   vectorStore.addMany(chunks, embeddings);
   vectorStore.persist(cfg.indexPath);
+  logger.info("Persisted vector index", { indexPath: cfg.indexPath });
+
   return { documents, chunks };
 }
 
@@ -355,8 +393,18 @@ async function main(): Promise<void> {
     process.env.RAG_CONFIG_PATH ?? path.resolve(__dirname, "../config/csv-rag.config.json");
   logger.info("Loading CSV RAG config", { configPath });
   const cfg = loadCsvRagConfig(configPath);
-  await runCsvIngestion(cfg);
-  logger.info("CSV ingestion complete", { indexPath: path.resolve(cfg.indexPath) });
+  const result = await runCsvIngestion(cfg);
+  logger.info("CSV ingestion complete - Summary", {
+    csvPath: cfg.csvPath,
+    rowsProcessed: result.documents.length,
+    chunksCreated: result.chunks.length,
+    averageChunksPerRow:
+      result.documents.length > 0 ? (result.chunks.length / result.documents.length).toFixed(2) : 0,
+    indexPath: path.resolve(cfg.indexPath),
+    embeddingModel: cfg.embeddingModel,
+    chunkSize: cfg.chunkSize,
+    chunkOverlap: cfg.chunkOverlap
+  });
 }
 
 if (require.main === module) {

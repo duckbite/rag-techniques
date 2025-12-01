@@ -8,6 +8,39 @@ Reliable RAG demonstrates how to harden retrieval before handing context to an L
 4. Highlighting the matching excerpt so reviewers can quickly inspect evidence.
 5. Falling back gracefully when no chunk clears the threshold.
 
+## What Makes This Project Unique
+
+**Reliable RAG** adds a validation layer between retrieval and generation. Its uniqueness lies in:
+
+- **Dual-criteria validation**: Uses both embedding similarity (semantic) and lexical overlap (keyword matching) to validate retrieved chunks, catching false positives that pure semantic search might miss.
+- **Transparent validation**: Shows validation scores, overlap metrics, and highlighted excerpts so users can see why chunks were accepted or rejected.
+- **Graceful degradation**: If no chunks pass validation, falls back to the top-scoring chunk (marked as low-confidence) rather than returning empty context, ensuring the LLM always has something to work with.
+
+### How the Unique Concepts Work
+
+1. **Dual-criteria validation**: Each retrieved chunk is evaluated on two dimensions:
+   - **Embedding similarity**: The cosine similarity score from vector search (must be >= `relevanceThreshold`, default 0.35).
+   - **Lexical overlap**: The percentage of question keywords that appear in the chunk (must be >= 0.4, or 40%).
+   A chunk is considered "validated" if it passes **either** criterion. This is controlled by `relevanceThreshold` in the config and the hardcoded 0.4 overlap threshold in `validateRetrievedChunks()`.
+
+2. **Keyword tokenization**: Questions are tokenized into meaningful keywords (words >= 4 characters, filtered to remove stop words) for lexical matching. This is done by `tokenizeQuestion()`.
+
+3. **Excerpt highlighting**: For validated chunks, the system extracts a window of text around the first matching keyword (controlled by `highlightWindow`) to show why the chunk is relevant. This is done by `extractExcerpt()`.
+
+4. **Fallback behavior**: If no chunks pass validation, the system includes the top-scoring chunk anyway (marked as "low-confidence") to ensure the LLM has context, even if it's uncertain.
+
+### How to Adjust for Different Use Cases
+
+- **For stricter validation**: Increase `relevanceThreshold` (e.g., 0.4-0.5) to require higher similarity scores, or modify the overlap threshold in code (currently 0.4) to require more keyword matches.
+
+- **For more permissive validation**: Decrease `relevanceThreshold` (e.g., 0.25-0.3) to accept lower similarity scores, or lower the overlap threshold in code.
+
+- **For better transparency**: Increase `highlightWindow` (e.g., 160-200) to show more context around matched keywords in the excerpt.
+
+- **For better recall**: Increase `topK` (e.g., 6-8) to retrieve more candidate chunks, giving validation more options to choose from.
+
+- **For better precision**: Decrease `topK` (e.g., 3-4) to focus on only the most similar chunks, reducing noise in validation.
+
 ## Configuration (`config/reliable-rag.config.json`)
 
 | Field | Description |

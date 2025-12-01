@@ -32,6 +32,8 @@ Each project in `projects/` must include a `README.md` file that contains:
    - What the project does and what RAG technique it demonstrates
    - How it differs from or builds upon other projects
    - Key concepts and learning objectives
+   - **What makes this project unique**: A dedicated subsection explaining the unique concepts, algorithms, or techniques that distinguish this project from others (e.g., dual-criteria validation in reliable-rag, proposition extraction in proposition-chunking, column inference in csv-rag)
+   - **How unique concepts work and can be adjusted**: Clear explanation of the unique mechanisms, what configuration parameters control them, and how to tune them for different use cases
 
 2. **Configuration Section**:
    - Description of all configuration parameters
@@ -66,6 +68,34 @@ Each project in `projects/` must include a `README.md` file that contains:
    - Common errors and their solutions
    - How to debug issues
    - Tips for improving results
+
+### Logging and Observability Requirements
+
+All projects must include extensive logging during ingestion and query operations when `LOG_LEVEL=info` (or when no `LOG_LEVEL` is set, defaulting to `info`):
+
+1. **Ingestion Logging**:
+   - Progress indicators for each major step (reading documents, chunking, embedding, storing)
+   - Per-item details for unique operations (e.g., propositions generated/graded per chunk, columns inferred per CSV)
+   - Summary statistics at the end (total documents processed, chunks created, embeddings generated, storage location)
+   - Error context with enough detail to diagnose issues
+
+2. **Query Logging**:
+   - Query received and processed
+   - Retrieval results (number of chunks retrieved, similarity scores)
+   - For projects with unique validation/processing steps, log those details (e.g., validation scores, overlap metrics, proposition matches)
+   - Final answer generation status
+   - Summary of the query operation (retrieval quality, answer confidence indicators if applicable)
+
+3. **Summary Requirements**:
+   - End-of-ingestion summary: total counts, success/failure rates, key metrics
+   - Per-query summary: retrieval quality, validation results (if applicable), answer generation status
+   - Use structured logging (JSON format via the logger) for easy parsing and analysis
+
+4. **Log Level Behavior**:
+   - `LOG_LEVEL=info`: Full detailed logging including summaries
+   - `LOG_LEVEL=warn`: Only warnings and errors
+   - `LOG_LEVEL=error`: Only errors
+   - Default to `info` if not set
 
 ### Code Documentation Requirements
 

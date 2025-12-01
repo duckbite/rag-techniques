@@ -61,10 +61,31 @@ export async function runIngestion(
 
   logger.info("Reading documents", { dataPath: cfg.dataPath });
   const documents = readDocs(cfg.dataPath);
-  logger.info("Loaded documents", { count: documents.length });
+  logger.info("Loaded documents", {
+    count: documents.length,
+    titles: documents.map((d) => d.title)
+  });
 
-  const chunks = documents.flatMap((doc) => chunker(doc, cfg));
-  logger.info("Created chunks", { count: chunks.length });
+  logger.info("Chunking documents", {
+    chunkSize: cfg.chunkSize,
+    chunkOverlap: cfg.chunkOverlap
+  });
+  const chunks = documents.flatMap((doc) => {
+    const docChunks = chunker(doc, cfg);
+    logger.info("Chunked document", {
+      documentId: doc.id,
+      title: doc.title,
+      chunkCount: docChunks.length,
+      totalChars: doc.content.length
+    });
+    return docChunks;
+  });
+  logger.info("Created chunks", {
+    count: chunks.length,
+    averageChunkSize: chunks.length > 0
+      ? Math.round(chunks.reduce((sum, c) => sum + c.content.length, 0) / chunks.length)
+      : 0
+  });
 
   if (chunks.length === 0) {
     logger.warn("No chunks generated; persisting empty index", { indexPath: cfg.indexPath });
@@ -72,9 +93,20 @@ export async function runIngestion(
     return { documents, chunks };
   }
 
+  logger.info("Generating embeddings", {
+    model: cfg.embeddingModel,
+    chunkCount: chunks.length
+  });
   const embeddings = await embedChunks(chunks, embeddingClient);
+  logger.info("Generated embeddings", {
+    count: embeddings.length,
+    dimension: embeddings[0]?.length ?? 0
+  });
+
+  logger.info("Storing chunks and embeddings in vector store");
   vectorStore.addMany(chunks, embeddings);
   vectorStore.persist(cfg.indexPath);
+  logger.info("Persisted vector index", { indexPath: cfg.indexPath });
 
   return { documents, chunks };
 }
@@ -91,9 +123,16 @@ async function main(): Promise<void> {
   logger.info("Loading config", { configPath });
   const cfg = loadRagConfig(configPath);
 
-  await runIngestion(cfg);
-  logger.info("Ingestion complete", {
-    indexPath: path.resolve(cfg.indexPath)
+  const result = await runIngestion(cfg);
+  logger.info("Ingestion complete - Summary", {
+    documentsProcessed: result.documents.length,
+    chunksCreated: result.chunks.length,
+    averageChunksPerDocument:
+      result.documents.length > 0 ? (result.chunks.length / result.documents.length).toFixed(2) : 0,
+    indexPath: path.resolve(cfg.indexPath),
+    embeddingModel: cfg.embeddingModel,
+    chunkSize: cfg.chunkSize,
+    chunkOverlap: cfg.chunkOverlap
   });
 }
 

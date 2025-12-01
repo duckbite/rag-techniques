@@ -1,11 +1,11 @@
 {
-  "chunkSize": 800,
-  "chunkOverlap": 200,
-  "topK": 4,
+  "chunkSize": 100,
+  "chunkOverlap": 50,
+  "topK": 10,
   "embeddingModel": "text-embedding-3-small",
   "chatModel": "gpt-4o-mini",
   "dataPath": "data",
   "indexPath": ".tmp/index/reliable-rag.index.json",
-  "relevanceThreshold": 0.35,
+  "relevanceThreshold": 0.25,
   "highlightWindow": 120
 }

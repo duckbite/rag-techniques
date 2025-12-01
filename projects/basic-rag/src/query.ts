@@ -103,9 +103,24 @@ export async function answerQuestion(
   const chatClient = deps.chatClient ?? new OpenAIChatClient();
   const store = deps.vectorStore ?? loadInMemoryVectorStore(cfg.indexPath);
 
+  logger.info("Processing query", { question: trimmedQuestion, topK: cfg.topK });
   const [queryEmbedding] = await embeddingClient.embed([trimmedQuestion]);
+  logger.info("Generated query embedding", { dimension: queryEmbedding.length });
+
   const retrieved = store.search(queryEmbedding, cfg.topK);
+  logger.info("Retrieved chunks", {
+    count: retrieved.length,
+    scores: retrieved.map((c) => c.score.toFixed(3)),
+    sources: retrieved.map((c) => c.metadata?.title ?? c.documentId)
+  });
+
   const prompt = buildPrompt(trimmedQuestion, retrieved);
+  logger.info("Built prompt", {
+    promptLength: prompt.length,
+    contextChunks: retrieved.length
+  });
+
+  logger.info("Generating answer", { chatModel: cfg.chatModel });
   const answer = await chatClient.chat(
     [
       {
@@ -115,6 +130,10 @@ export async function answerQuestion(
     ],
     cfg.chatModel
   );
+  logger.info("Generated answer", {
+    answerLength: answer.length,
+    topScore: retrieved.length > 0 ? retrieved[0].score.toFixed(3) : "N/A"
+  });
 
   return { answer, retrieved, prompt };
 }
@@ -156,7 +175,7 @@ async function interactiveQuery(): Promise<void> {
     const question = (await ask("> ")).trim();
     if (!question || question.toLowerCase() === "exit") break;
 
-    const { answer } = await answerQuestion(question, cfg, {
+    const { answer, retrieved } = await answerQuestion(question, cfg, {
       embeddingClient,
       chatClient,
       vectorStore: store
@@ -165,6 +184,12 @@ async function interactiveQuery(): Promise<void> {
     // Display the answer to the user
     // eslint-disable-next-line no-console
     console.log("\nAnswer:\n", answer, "\n");
+    logger.info("Query summary", {
+      question,
+      chunksRetrieved: retrieved.length,
+      topScore: retrieved.length > 0 ? retrieved[0].score.toFixed(3) : "N/A",
+      answerGenerated: answer.length > 0
+    });
   }
 
   // Clean up: close the readline interface

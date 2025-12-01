@@ -335,16 +335,41 @@ export async function runPropositionIngestion(
   logger.info("Generated document chunks", { count: chunks.length });
 
   const propositionChunks: Chunk[] = [];
+  let totalPropositionsGenerated = 0;
+  let totalPropositionsGraded = 0;
+  let totalPropositionsKept = 0;
+
   for (const chunk of chunks) {
     const proposals = await generatePropositionsForChunk(chunk, cfg, chatClient);
+    totalPropositionsGenerated += proposals.length;
+    logger.info("Generated propositions for chunk", {
+      chunkId: chunk.id,
+      documentId: chunk.documentId,
+      rawCount: proposals.length,
+      sample: proposals.slice(0, Math.min(3, proposals.length))
+    });
+
     const graded = await gradePropositions(chunk, proposals, cfg, chatClient);
-    graded
-      .filter((prop) => prop.score >= cfg.gradingThreshold)
-      .forEach((prop, idx) => propositionChunks.push(createPropositionChunk(chunk, prop, idx)));
+    totalPropositionsGraded += graded.length;
+    logger.info("Graded propositions for chunk", {
+      chunkId: chunk.id,
+      gradedCount: graded.length,
+      scoresSample: graded.slice(0, Math.min(5, graded.length)).map((p) => p.score)
+    });
+
+    const kept = graded.filter((prop) => prop.score >= cfg.gradingThreshold);
+    totalPropositionsKept += kept.length;
+    kept.forEach((prop, idx) => propositionChunks.push(createPropositionChunk(chunk, prop, idx)));
   }
 
   if (propositionChunks.length === 0) {
-    logger.warn("No propositions passed grading; persisting empty index");
+    logger.warn("No propositions passed grading; persisting empty index", {
+      documents: documents.length,
+      chunks: chunks.length,
+      totalPropositionsGenerated,
+      totalPropositionsGraded,
+      totalPropositionsKept
+    });
     vectorStore.persist(cfg.indexPath);
     return [];
   }
@@ -352,7 +377,15 @@ export async function runPropositionIngestion(
   const embeddings = await embedChunks(propositionChunks, embeddingClient);
   vectorStore.addMany(propositionChunks, embeddings);
   vectorStore.persist(cfg.indexPath);
-  logger.info("Stored graded propositions", { count: propositionChunks.length });
+  logger.info("Stored graded propositions", {
+    documents: documents.length,
+    chunks: chunks.length,
+    totalPropositionsGenerated,
+    totalPropositionsGraded,
+    totalPropositionsKept,
+    keptPerChunkAverage: chunks.length > 0 ? totalPropositionsKept / chunks.length : 0,
+    count: propositionChunks.length
+  });
   return propositionChunks;
 }
 
