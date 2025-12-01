@@ -24,13 +24,27 @@ pnpm install
 
 ### Example commands
 
-Basic RAG (after installing dependencies):
-
 ```bash
-pnpm basic-rag:ingest   # build a small local index from sample docs
-pnpm basic-rag:query    # run an interactive query against the index
+# Basic text documents
+pnpm basic-rag:ingest
+pnpm basic-rag:query
+
+# Structured CSV retrieval
+pnpm csv-rag:ingest
+pnpm csv-rag:query
+
+# Reliability-focused pipeline
+pnpm reliable-rag:ingest
+pnpm reliable-rag:query
+
+# Chunk benchmarking utility
+pnpm chunk-optimizer:benchmark
+
+# Proposition-based retrieval
+pnpm proposition-chunking:ingest
+pnpm proposition-chunking:query
 ```
 
-See each project’s `README.md` for more detailed usage.
+See each project’s `README.md` for detailed configuration, data prep, and troubleshooting guidance.
 
 

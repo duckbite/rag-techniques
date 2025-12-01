@@ -1,0 +1,8 @@
+Sustainability Report 2024
+==========================
+
+Water stewardship remains the top priority. The Portland campus reduced total consumption by 18% year over year by re-using cooling water and harvesting rainwater for landscaping. Suppliers in Vietnam reported a 22% drop in dye-house usage after installing closed-loop treatment.
+
+Digital commerce continued to expand, contributing 29% of total revenue. The omnichannel team focuses on predictive demand planning and localized product drops. Inventory turns improved to 5.3x despite macro volatility.
+
+The risk office enforces a retrieval audit process for every AI-powered assistant before production deployment. Each launch requires a retrieval quality score of 0.75 or higher, plus manual validation of the top five answers per benchmark query set.

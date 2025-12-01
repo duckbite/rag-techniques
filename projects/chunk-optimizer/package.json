@@ -1,0 +1,17 @@
+{
+  "name": "chunk-optimizer",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint \"src/**/*.ts\"",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "benchmark": "ts-node src/chunkOptimizer.ts"
+  },
+  "devDependencies": {
+    "vitest": "^4.0.14"
+  }
+}

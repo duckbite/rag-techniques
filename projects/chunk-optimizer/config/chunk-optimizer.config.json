@@ -1,0 +1,6 @@
+{
+  "sampleDocPath": "data/manufacturing_update.txt",
+  "chunkSizes": [400, 600, 800, 1200],
+  "chunkOverlaps": [50, 150, 250],
+  "reportPath": ".tmp/reports/chunk-results.json"
+}

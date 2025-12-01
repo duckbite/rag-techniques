@@ -34,7 +34,35 @@ importers:
         specifier: ^4.0.14
         version: 4.0.14(@types/node@22.19.1)
 
-  projects/basic-rag: {}
+  projects/basic-rag:
+    devDependencies:
+      vitest:
+        specifier: ^4.0.14
+        version: 4.0.14(@types/node@22.19.1)
+
+  projects/chunk-optimizer:
+    devDependencies:
+      vitest:
+        specifier: ^4.0.14
+        version: 4.0.14(@types/node@22.19.1)
+
+  projects/csv-rag:
+    devDependencies:
+      vitest:
+        specifier: ^4.0.14
+        version: 4.0.14(@types/node@22.19.1)
+
+  projects/proposition-chunking:
+    devDependencies:
+      vitest:
+        specifier: ^4.0.14
+        version: 4.0.14(@types/node@22.19.1)
+
+  projects/reliable-rag:
+    devDependencies:
+      vitest:
+        specifier: ^4.0.14
+        version: 4.0.14(@types/node@22.19.1)
 
 packages:
 

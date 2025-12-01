@@ -1,0 +1,11 @@
+The manufacturing group consolidated three factories into a leaner network during FY24.
+Each facility now follows an identical documentation standard: background, insight, action, and owner.
+This structure compresses context yet keeps every decision auditable.
+
+An excerpt from the latest report:
+- Background: Foam offcuts increased 12% because of sneaker upper redesigns that rely on thicker panels.
+- Insight: Machine logs revealed that cutting programs still use last year's optimal nesting layout.
+- Action: Update the CAD scripts and run an A/B test across Batch 6 with live telemetry to watch for drift.
+- Owner: Materials engineering + digital twin team.
+
+The process notes stretch to several hundred lines; chunk sizes impact how clearly the telemetry recommendations sync with root causes.

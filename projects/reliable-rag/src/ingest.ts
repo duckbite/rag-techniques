@@ -1,4 +1,3 @@
-import fs from "node:fs";
 import path from "node:path";
 import { loadEnv } from "../../../shared/typescript/utils/env";
 import { loadRagConfig } from "../../../shared/typescript/utils/config";
@@ -10,52 +9,29 @@ import {
   VectorStore,
   embedChunks
 } from "../../../shared/typescript/utils/vectorStore";
-import { readDocumentsFromDir } from "../../../shared/typescript/utils/documents";
 import { simpleChunkDocument } from "../../../shared/typescript/utils/chunking";
-export { simpleChunkDocument } from "../../../shared/typescript/utils/chunking";
-export { readDocumentsFromDir } from "../../../shared/typescript/utils/documents";
-/**
- * Main ingestion pipeline for the basic RAG system.
- *
- * This function orchestrates the complete document ingestion process:
- * 1. Loads environment variables (including OpenAI API key)
- * 2. Loads configuration from JSON file
- * 3. Reads documents from the data directory
- * 4. Splits documents into chunks
- * 5. Generates embeddings for each chunk
- * 6. Stores chunks and embeddings in a vector store
- * 7. Persists the vector store to disk for later use
- *
- * The resulting index file can be loaded by the query script to enable
- * semantic search and question answering.
- *
- * @throws Error if configuration is invalid, documents cannot be read,
- *         embeddings fail to generate, or the index cannot be persisted
- *
- * @example
- * ```bash
- * # Run from projects/basic-rag directory
- * pnpm run ingest
- * ```
- */
-export interface IngestDependencies {
+import { readDocumentsFromDir } from "../../../shared/typescript/utils/documents";
+
+export interface ReliableIngestDependencies {
   readDocuments?: (dir: string) => Document[];
-  chunkDocument?: (doc: Document, cfg: RagConfig) => Chunk[];
+  chunkDocument?: (doc: Document, cfg: Pick<RagConfig, "chunkSize" | "chunkOverlap">) => Chunk[];
   embeddingClient?: EmbeddingClient;
   vectorStore?: VectorStore;
 }
 
-export interface IngestionResult {
+export interface ReliableIngestionResult {
   documents: Document[];
   chunks: Chunk[];
 }
 
-export async function runIngestion(
+export async function runReliableIngestion(
   cfg: RagConfig,
-  deps: IngestDependencies = {}
-): Promise<IngestionResult> {
+  deps: ReliableIngestDependencies = {}
+): Promise<ReliableIngestionResult> {
   const readDocs = deps.readDocuments ?? readDocumentsFromDir;
-  const chunker = deps.chunkDocument ?? simpleChunkDocument;
+  const chunker =
+    deps.chunkDocument ??
+    ((doc: Document) => simpleChunkDocument(doc, { chunkSize: cfg.chunkSize, chunkOverlap: cfg.chunkOverlap }));
   const embeddingClient = deps.embeddingClient ?? new OpenAIEmbeddingClient(cfg.embeddingModel);
   const vectorStore = deps.vectorStore ?? new InMemoryVectorStore();
 
@@ -80,28 +56,19 @@ export async function runIngestion(
 }
 
 async function main(): Promise<void> {
-  // Load environment variables from .env file
   loadEnv();
-
-  // Determine config path: use RAG_CONFIG_PATH env var or default location
   const configPath =
-    process.env.RAG_CONFIG_PATH ??
-    path.resolve(__dirname, "../config/basic-rag.config.json");
-
+    process.env.RAG_CONFIG_PATH ?? path.resolve(__dirname, "../config/reliable-rag.config.json");
   logger.info("Loading config", { configPath });
   const cfg = loadRagConfig(configPath);
-
-  await runIngestion(cfg);
-  logger.info("Ingestion complete", {
-    indexPath: path.resolve(cfg.indexPath)
-  });
+  await runReliableIngestion(cfg);
+  logger.info("Reliable ingestion complete", { indexPath: path.resolve(cfg.indexPath) });
 }
 
 if (require.main === module) {
   main().catch((err) => {
-    logger.error("Ingestion failed", { err });
+    logger.error("Reliable ingestion failed", { err });
     process.exitCode = 1;
   });
 }
-
 

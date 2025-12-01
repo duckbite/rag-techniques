@@ -1,0 +1,11 @@
+{
+  "chunkSize": 800,
+  "chunkOverlap": 200,
+  "topK": 4,
+  "embeddingModel": "text-embedding-3-small",
+  "chatModel": "gpt-4o-mini",
+  "dataPath": "data",
+  "indexPath": ".tmp/index/csv-rag.index.json",
+  "csvPath": "data/unicorn_companies_metrics.csv",
+  "delimiter": ","
+}

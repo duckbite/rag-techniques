@@ -8,7 +8,14 @@
     "lint": "turbo lint",
     "test": "turbo test",
     "basic-rag:ingest": "pnpm --filter basic-rag run ingest",
-    "basic-rag:query": "pnpm --filter basic-rag run query"
+    "basic-rag:query": "pnpm --filter basic-rag run query",
+    "csv-rag:ingest": "pnpm --filter csv-rag run ingest",
+    "csv-rag:query": "pnpm --filter csv-rag run query",
+    "reliable-rag:ingest": "pnpm --filter reliable-rag run ingest",
+    "reliable-rag:query": "pnpm --filter reliable-rag run query",
+    "chunk-optimizer:benchmark": "pnpm --filter chunk-optimizer run benchmark",
+    "proposition-chunking:ingest": "pnpm --filter proposition-chunking run ingest",
+    "proposition-chunking:query": "pnpm --filter proposition-chunking run query"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

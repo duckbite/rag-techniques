@@ -3,15 +3,20 @@
 Typescript port of https://github.com/NirDiamant/RAG_Techniques
 
 - uses typescript instead of python
-- each subproject has a README.md file explaining how to use it
+- each subproject has a README.md file explaining what it does and how to use it
 - instead of one long notebook divide into various scripts / functions per project responsible for a single task or task group (e.g. db initialization, creating embeddings and inserting items in db, read from db, perform analysis, etc.). Make this a logical distribution per project.
 - main project has universal functionality (e.g. adapters to datas sources, example data files, common types, etc)
+- This is project for learning and understanding the code around RAG techniques. Describe the code extensively with JSdoc
 
 
 ## Roadmap & Tracking
 
 - We are porting the 34 techniques documented in [`NirDiamant/RAG_Techniques`](https://github.com/NirDiamant/RAG_Techniques) into standalone TypeScript projects under `projects/`.
 - `projects/basic-rag` is complete and acts as the baseline for the remaining work.
+- `projects/csv-rag` adds structured CSV ingestion with automatic column inference and is the first completed item in the Phase 1 parity plan.
+- `projects/reliable-rag` now validates retrieved chunks via similarity + lexical overlap before prompting the LLM.
+- `projects/chunk-optimizer` adds a benchmarking CLI for experimenting with chunk sizes/overlaps.
+- `projects/proposition-chunking` generates and grades LLM-derived propositions before storing them in the vector index.
 - Active planning, sequencing, and status for each upcoming project now lives in `docs/plan.md`; update that file whenever scope, ordering, or ownership changes.
 - We will prioritize foundational techniques (CSV ingestion, reliable RAG, advanced chunking) before moving into query enhancement, context enrichment, advanced retrieval, evaluation, explainability, and graph/agent architectures to keep dependencies manageable.
 
@@ -44,6 +49,7 @@ Each project in `projects/` must include a `README.md` file that contains:
    - What happens during execution (step-by-step explanation)
    - Example commands with expected output
    - How to interpret results
+   - At least one **validation scenario** under the Usage section that shows a concrete test (command + query) and the expected answer/behavior for the default sample data, so users can quickly verify that ingestion and querying work end-to-end
 
 5. **Expected Outcomes**:
    - What should happen after running each script

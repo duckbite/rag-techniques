@@ -1,0 +1,8 @@
+Athlete Services Charter
+------------------------
+1. Every elite training center receives weekly surface scans that quantify wear, energy return, and safety hazards.
+2. For long-form content, coaches expect propositions that map inputs to verifiable claims so that retrieval remains truthful.
+3. When a model cannot find a grounded answer it must say so, log the query, and trigger an annotation task.
+4. The data team catalogs every apparel fabric experiment with propositions describing composition, purpose, and season.
+
+Proposition-oriented chunking helps capture these facts. Each proposition is a concise, testable statement that stands on its own.
