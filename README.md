@@ -223,7 +223,7 @@ This is an educational project focused on clarity and learning. When contributin
 
 ## License
 
-[Add your license information here]
+MIT License - See [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 
