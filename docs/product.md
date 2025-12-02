@@ -20,7 +20,17 @@ Typescript port of https://github.com/NirDiamant/RAG_Techniques
 
 ## Documentation Requirements
 
-Since these projects are for learning, comprehensive documentation is required for each project:
+Since these projects are for learning, comprehensive documentation is required for each project.
+
+### Main README.md Requirements
+
+The main `README.md` file contains the following:
+
+- Project Description and rationale
+- Diagram of a RAG system and short explanation of the various elements in the system.
+- Project Structure
+- Prerequisites
+- Table with projects, including name, description, what the project demonstrates and link to project README.
 
 ### Project README.md Requirements
 
