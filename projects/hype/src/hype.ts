@@ -96,7 +96,7 @@ Questions:
 
     // Skip lines that are just labels or headers
     if (
-      cleaned.length > 10 &&
+      cleaned.length >= 3 &&
       !cleaned.toLowerCase().startsWith("questions:") &&
       !cleaned.toLowerCase().startsWith("sub-queries:")
     ) {

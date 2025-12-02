@@ -1,0 +1,13 @@
+{
+    "name": "@shared/typescript-utils",
+    "version": "0.1.0",
+    "private": true,
+    "type": "commonjs",
+    "scripts": {
+      "test": "vitest run",
+      "test:watch": "vitest watch"
+    },
+    "devDependencies": {
+      "vitest": "^4.0.14"
+    }
+  }

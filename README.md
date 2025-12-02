@@ -160,18 +160,6 @@ pnpm run ingest
 pnpm run query
 ```
 
-Or use pnpm workspace commands from the repository root:
-
-```bash
-# Basic RAG
-pnpm basic-rag:ingest
-pnpm basic-rag:query
-
-# CSV RAG
-pnpm csv-rag:ingest
-pnpm csv-rag:query
-```
-
 See each project's README for detailed setup instructions, configuration options, and usage examples.
 
 ## Projects
