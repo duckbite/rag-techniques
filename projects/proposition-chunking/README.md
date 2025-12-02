@@ -44,6 +44,51 @@ The end-to-end flow mirrors the reference notebook:
 4. Embed and store only the high-scoring propositions.
 5. Query against proposition vectors and display the original chunk excerpt for context.
 
+## Process Diagrams
+
+Proposition Chunking transforms the retrieval unit from raw chunks to extracted propositions:
+
+### Ingestion Process
+
+```mermaid
+flowchart LR
+    A[Documents] --> B[Chunking]
+    B --> C[Generate Propositions<br/>LLM extracts facts]
+    C --> D[Grade Propositions<br/>Score 0-1]
+    D --> E{Score >=<br/>Threshold?}
+    E -->|Yes| F[Embed Propositions]
+    E -->|No| G[Discard]
+    F --> H[(Vector Store<br/>Proposition index)]
+    
+    style A fill:#e1f5ff
+    style C fill:#fff4e1
+    style D fill:#fff4e1
+    style E fill:#ffebee
+    style F fill:#e1f5ff
+    style H fill:#f0f0f0,stroke:#01579b,stroke-width:2px
+```
+
+### Query Process
+
+Querying matches against proposition embeddings rather than raw chunks:
+
+```mermaid
+flowchart LR
+    E[User Query] --> F[Query Embedding]
+    F --> G[Similarity Search<br/>Against propositions]
+    G --> H[Top-K Propositions<br/>With source chunks]
+    H --> I[LLM Generation<br/>Fact-focused context]
+    I --> J[Final Answer]
+    
+    VStore[(Proposition<br/>Vector Store)] -.->|Retrieve| G
+    
+    style E fill:#fff4e1
+    style G fill:#fff4e1
+    style H fill:#fff4e1
+    style J fill:#fff4e1
+    style VStore fill:#f0f0f0,stroke:#01579b,stroke-width:2px
+```
+
 ## Configuration
 
 `config/proposition-chunking.config.json` introduces new fields:
@@ -72,7 +117,7 @@ During ingestion, logs summarize how many propositions were generated and how ma
 
 ### Quick validation (sanity check)
 
-With the default `data/product_strategy.txt`, you can validate the pipeline with:
+With the default `shared/assets/data/product_strategy.txt`, you can validate the pipeline with:
 
 ```bash
 > What must the model do when it cannot find a grounded answer?
@@ -89,6 +134,54 @@ pnpm --filter proposition-chunking test
 ```
 
 Tests mock the LLM to verify proposition parsing, grading, and retrieval formatting without calling external APIs.
+
+## Understanding the Code
+
+### Key Components
+
+1. **`src/ingest.ts`**: Enhanced ingestion pipeline with proposition generation
+   - Standard document reading and chunking
+   - `generatePropositions()`: Uses LLM to extract concise factual statements from each chunk
+   - `gradePropositions()`: Scores each proposition for accuracy, completeness, and groundedness
+   - Filters propositions by grading threshold
+   - Embeds only high-scoring propositions
+   - Stores propositions with links back to source chunks
+
+2. **`src/query.ts`**: Query pipeline with proposition-based retrieval
+   - Loads proposition-enhanced vector index
+   - Retrieves propositions (not raw chunks) based on semantic similarity
+   - Formats retrieved propositions with source chunk context for the LLM
+   - Generates answers using fact-focused context
+
+3. **Shared Utilities** (in `shared/typescript/utils/`):
+   - `vectorStore.ts`: Vector storage and similarity search
+   - `llm.ts`: OpenAI client wrappers for embeddings and chat
+   - `config.ts`: Configuration loading and validation
+   - `types.ts`: TypeScript type definitions
+
+### Algorithm Overview
+
+**Proposition Extraction Pipeline**:
+1. **Chunk**: Split documents using standard fixed-size chunking
+2. **Generate**: For each chunk, use LLM to extract up to `maxPropositions` concise factual statements
+   - Propositions should be self-contained and verifiable
+   - Each proposition is a standalone fact that can be checked
+3. **Grade**: Score each proposition (0-1) based on:
+   - **Accuracy**: Correctly represents chunk information
+   - **Completeness**: Contains enough information to be meaningful
+   - **Groundedness**: Directly supported by chunk (not inferred)
+4. **Filter**: Keep only propositions with score >= `gradingThreshold`
+5. **Embed**: Generate embeddings for validated propositions
+6. **Store**: Save propositions with metadata linking to source chunks
+
+**Proposition Query Pipeline**:
+1. **Query**: User asks a question
+2. **Embed**: Convert query to vector
+3. **Retrieve**: Find top-K most similar proposition embeddings
+4. **Format**: Include both propositions and source chunk excerpts in context
+5. **Generate**: LLM generates answer using fact-focused propositions
+
+**Key Insight**: By retrieving focused facts (propositions) instead of paragraphs, the system provides more precise context and reduces noise, leading to more accurate answers.
 
 ## Troubleshooting
 

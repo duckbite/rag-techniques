@@ -71,6 +71,46 @@ HyPE addresses the same semantic gap problem as HyDE, but takes a different appr
 - **For faster ingestion**: Decrease `questionsPerChunk` to 2-3 (fewer questions = faster, but less coverage)
 - **For specific domains**: Adjust the question generation prompt in `src/hype.ts` to generate domain-specific questions
 
+## Process Diagrams
+
+HyPE pre-generates hypothetical questions during ingestion and matches queries against questions instead of documents:
+
+### Ingestion Process with Question Generation
+
+```mermaid
+flowchart LR
+    A[Documents] --> B[Chunking]
+    B --> C[Generate Questions<br/>LLM creates 3-5 questions<br/>per chunk]
+    C --> D[Embed Questions<br/>Multiple embeddings<br/>per chunk]
+    D --> E[(Vector Store<br/>Question embeddings)]
+    
+    style A fill:#e1f5ff
+    style B fill:#e1f5ff
+    style C fill:#fff4e1
+    style D fill:#fff4e1
+    style E fill:#f0f0f0,stroke:#01579b,stroke-width:2px
+```
+
+### Query Process with Question Matching
+
+```mermaid
+flowchart LR
+    F[User Query<br/>Question] --> G[Query Embedding]
+    G --> H[Similarity Search<br/>Against question<br/>embeddings]
+    H --> I[Top-K Chunks<br/>Matched by questions]
+    I --> J[LLM Generation<br/>Context + Query]
+    J --> K[Final Answer]
+    
+    VStore[(Question<br/>Embeddings)] -.->|Retrieve| H
+    
+    style F fill:#fff4e1
+    style G fill:#fff4e1
+    style H fill:#fff4e1
+    style I fill:#fff4e1
+    style K fill:#fff4e1
+    style VStore fill:#f0f0f0,stroke:#01579b,stroke-width:2px
+```
+
 ## Configuration
 
 The project is configured via `config/hype.config.json`:
@@ -82,7 +122,7 @@ The project is configured via `config/hype.config.json`:
   "topK": 4,
   "embeddingModel": "text-embedding-3-small",
   "chatModel": "gpt-4o-mini",
-  "dataPath": "data",
+  "dataPath": "../../shared/assets/data",
   "indexPath": ".tmp/index/hype.index.json",
   "questionGenModel": "gpt-4o-mini",
   "questionsPerChunk": 4
@@ -97,7 +137,7 @@ The project is configured via `config/hype.config.json`:
 - `topK`: Number of chunks to retrieve (default: 4)
 - `embeddingModel`: OpenAI embedding model (default: "text-embedding-3-small")
 - `chatModel`: LLM for answer generation (default: "gpt-4o-mini")
-- `dataPath`: Path to documents directory (default: "data")
+- `dataPath`: Path to documents directory (default: "../../shared/assets/data")
 - `indexPath`: Path to vector index file (default: ".tmp/index/hype.index.json")
 
 **HyPE Specific Parameters**:
@@ -129,7 +169,7 @@ The project is configured via `config/hype.config.json`:
    ```
 
 3. **Prepare sample data**:
-   Place `.txt` or `.md` files in the `data/` directory. You can copy sample data from `projects/basic-rag/data/`.
+   The project uses sample data from `shared/assets/data/` by default (configured via `dataPath`). You can modify `dataPath` to point to your own document directory.
 
 ## Usage
 
@@ -144,7 +184,7 @@ pnpm run ingest
 
 **What happens during ingestion:**
 1. Loads configuration from `config/hype.config.json`
-2. Reads all `.txt` and `.md` files from the `data/` directory
+2. Reads all `.txt` and `.md` files from the directory specified in `dataPath` (default: `shared/assets/data/`)
 3. Splits documents into chunks with configurable size and overlap
 4. **For each chunk**:
    - Generates multiple hypothetical questions (using `questionGenModel`)

@@ -49,6 +49,47 @@ HyDE addresses a fundamental problem in RAG systems: **the semantic gap between 
 - **For shorter documents**: Set `targetDocumentLength` smaller than `chunkSize` if your documents are typically shorter
 - **For longer documents**: Set `targetDocumentLength` larger than `chunkSize` if you want more comprehensive hypothetical documents
 
+## Process Diagrams
+
+HyDE generates hypothetical documents at query time instead of using the query directly:
+
+### Ingestion Process
+
+The ingestion process follows the standard RAG pattern:
+
+```mermaid
+flowchart LR
+    A[Documents] --> B[Chunking]
+    B --> C[Embedding]
+    C --> D[(Vector Store)]
+    
+    style A fill:#e1f5ff
+    style B fill:#e1f5ff
+    style C fill:#e1f5ff
+    style D fill:#f0f0f0,stroke:#01579b,stroke-width:2px
+```
+
+### Query Process with Hypothetical Document Generation
+
+```mermaid
+flowchart LR
+    E[User Query] --> F[Generate Hypothetical<br/>Document<br/>LLM creates answer doc]
+    F --> G[Embed Hypothetical<br/>Document]
+    G --> H[Similarity Search<br/>Using doc embedding]
+    H --> I[Top-K Chunks<br/>Retrieved]
+    I --> J[LLM Generation<br/>Context + Query]
+    J --> K[Final Answer]
+    
+    VStore[(Vector Store)] -.->|Retrieve| G
+    
+    style E fill:#fff4e1
+    style F fill:#fff4e1
+    style G fill:#fff4e1
+    style H fill:#fff4e1
+    style K fill:#fff4e1
+    style VStore fill:#f0f0f0,stroke:#01579b,stroke-width:2px
+```
+
 ## Configuration
 
 The project is configured via `config/hyde.config.json`:
@@ -60,7 +101,7 @@ The project is configured via `config/hyde.config.json`:
   "topK": 4,
   "embeddingModel": "text-embedding-3-small",
   "chatModel": "gpt-4o-mini",
-  "dataPath": "data",
+  "dataPath": "../../shared/assets/data",
   "indexPath": ".tmp/index/hyde.index.json",
   "hydeModel": "gpt-4o-mini",
   "targetDocumentLength": 800
@@ -75,7 +116,7 @@ The project is configured via `config/hyde.config.json`:
 - `topK`: Number of chunks to retrieve (default: 4)
 - `embeddingModel`: OpenAI embedding model (default: "text-embedding-3-small")
 - `chatModel`: LLM for answer generation (default: "gpt-4o-mini")
-- `dataPath`: Path to documents directory (default: "data")
+- `dataPath`: Path to documents directory (default: "../../shared/assets/data")
 - `indexPath`: Path to vector index file (default: ".tmp/index/hyde.index.json")
 
 **HyDE Specific Parameters**:
@@ -106,7 +147,7 @@ The project is configured via `config/hyde.config.json`:
    ```
 
 3. **Prepare sample data**:
-   Place `.txt` or `.md` files in the `data/` directory. You can copy sample data from `projects/basic-rag/data/`.
+   The project uses sample data from `shared/assets/data/` by default (configured via `dataPath`). You can modify `dataPath` to point to your own document directory.
 
 ## Usage
 
@@ -121,7 +162,7 @@ pnpm run ingest
 
 **What happens during ingestion:**
 1. Loads configuration from `config/hyde.config.json`
-2. Reads all `.txt` and `.md` files from the `data/` directory
+2. Reads all `.txt` and `.md` files from the directory specified in `dataPath` (default: `shared/assets/data/`)
 3. Splits documents into chunks with configurable size and overlap
 4. Generates embeddings for each chunk
 5. Stores chunks and embeddings in a vector store

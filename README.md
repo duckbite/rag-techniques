@@ -19,36 +19,55 @@ The monorepo structure allows you to:
 
 ## Understanding RAG Systems
 
-Retrieval-Augmented Generation (RAG) is a technique that enhances language models with external knowledge by retrieving relevant information from a document collection before generating responses. Here's how a RAG system works:
+Retrieval-Augmented Generation (RAG) is a technique that enhances language models with external knowledge by retrieving relevant information from a document collection before generating responses. Here's how a basic RAG system works:
+
+### Document Ingestion
+
+The ingestion process prepares documents for retrieval by converting them into searchable vector embeddings:
 
 ```mermaid
-flowchart TB
-    subgraph Ingestion["📚 Document Ingestion"]
-        A[Documents<br/>Text/CSV/PDF] --> B[Chunking<br/>Split into pieces]
-        B --> C[Embedding<br/>Convert to vectors]
-        C --> D[(Vector Store<br/>Persisted Index)]
-    end
+flowchart LR
+    A[Documents<br/>Text/CSV/PDF] --> B[Chunking<br/>Split into pieces]
+    B --> C[Embedding<br/>Convert to vectors]
+    C --> D[(Vector Store<br/>Persisted Index)]
     
-    subgraph Query["🔍 Query Processing"]
-        E[User Query] --> F[Query Embedding<br/>Convert to vector]
-        F --> G[Similarity Search<br/>Find relevant chunks]
-        D -.->|Retrieve| G
-        G --> H[Top-K Chunks<br/>Retrieved]
-        H --> I[LLM Generation<br/>Context + Query]
-        I --> J[Final Answer]
-    end
-    
-    style Ingestion fill:#e1f5ff
-    style Query fill:#fff4e1
-    style D fill:#f0f0f0
+    style A fill:#e1f5ff
+    style B fill:#e1f5ff
+    style C fill:#e1f5ff
+    style D fill:#f0f0f0,stroke:#01579b,stroke-width:2px
 ```
+
+### Query Processing
+
+The query process retrieves relevant information and generates answers:
+
+```mermaid
+flowchart LR
+    E[User Query] --> F[Query Embedding<br/>Convert to vector]
+    F --> G[Similarity Search<br/>Find relevant chunks]
+    G --> H[Top-K Chunks<br/>Retrieved]
+    H --> I[LLM Generation<br/>Context + Query]
+    I --> J[Final Answer]
+    
+    VStore[(Vector Store<br/>Persisted Index)] -.->|Retrieve| G
+    
+    style E fill:#fff4e1
+    style F fill:#fff4e1
+    style G fill:#fff4e1
+    style H fill:#fff4e1
+    style I fill:#fff4e1
+    style J fill:#fff4e1
+    style VStore fill:#f0f0f0,stroke:#01579b,stroke-width:2px
+```
+
+> **Note**: Some projects have variations on these processes (e.g., CSV-RAG processes CSV rows differently, proposition-chunking extracts propositions before embedding, HyDE generates hypothetical documents at query time). See individual project READMEs for project-specific diagrams.
 
 ### Key Components Explained
 
 1. **Documents**: Source materials (text files, PDFs, CSVs) that contain the knowledge you want to query
 2. **Chunking**: Splitting large documents into smaller, manageable pieces (typically 400-1200 characters) to fit embedding model limits and improve retrieval precision
 3. **Embedding**: Converting text chunks into dense vector representations that capture semantic meaning using language models
-4. **Vector Store**: A searchable database of embeddings and their corresponding text chunks, stored persistently as JSON files
+4. **Vector Store**: A searchable database of embeddings and their corresponding text chunks, stored persistently as JSON files or in a cloud Vector DB
 5. **Query Embedding**: Converting the user's question into the same vector space as document chunks
 6. **Similarity Search**: Finding the most relevant chunks by comparing vector similarities (typically cosine similarity)
 7. **LLM Generation**: Using a language model to generate answers based on the retrieved context and the original query

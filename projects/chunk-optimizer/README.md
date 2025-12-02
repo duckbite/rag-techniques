@@ -32,7 +32,7 @@ The chunk optimizer lets you explore different chunkSize / chunkOverlap combinat
 
 ```json
 {
-  "sampleDocPath": "data/manufacturing_update.txt",
+  "sampleDocPath": "../../shared/assets/data/manufacturing_update.txt",
   "chunkSizes": [400, 600, 800, 1200],
   "chunkOverlaps": [50, 150, 250],
   "reportPath": ".tmp/reports/chunk-results.json"
@@ -104,7 +104,7 @@ If validation improves (more relevant chunks, clearer answers), you’ve found a
 
 ### Quick validation (sanity check)
 
-With the default `data/manufacturing_update.txt`, running:
+With the default `shared/assets/data/manufacturing_update.txt`, running:
 
 ```bash
 pnpm run benchmark

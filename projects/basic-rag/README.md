@@ -47,7 +47,7 @@ This is the simplest RAG implementation and serves as the baseline for understan
 
 - Node.js 22+ and pnpm installed
 - OpenAI API key (set in `.env` file at repository root)
-- Sample documents in the `data/` directory
+- Sample documents (available in `shared/assets/data/`, configured via `dataPath` in config)
 
 ## Configuration
 
@@ -60,7 +60,7 @@ The project is configured via `config/basic-rag.config.json`:
   "topK": 4,                  // Number of chunks to retrieve per query
   "embeddingModel": "text-embedding-3-small",  // OpenAI embedding model
   "chatModel": "gpt-4o-mini", // OpenAI chat model for generation
-  "dataPath": "data",          // Relative path to documents directory
+  "dataPath": "../../shared/assets/data",  // Path to documents directory (relative to config file)
   "indexPath": ".tmp/index/basic-rag.index.json"  // Where to save/load the vector index (stored outside git-tracked code)
 ```
 
@@ -92,7 +92,7 @@ The project is configured via `config/basic-rag.config.json`:
    ```
 
 3. **Prepare sample data**:
-   Place `.txt` or `.md` files in the `data/` directory. The project includes sample data from the original RAG_Techniques repository.
+   The project uses sample data from `shared/assets/data/` by default (configured via `dataPath` in the config). You can modify `dataPath` to point to your own document directory. The default includes sample documents from the original RAG_Techniques repository.
 
 ## Usage
 
@@ -107,7 +107,7 @@ pnpm run ingest
 
 **What happens during ingestion:**
 1. Loads configuration from `config/basic-rag.config.json`
-2. Reads all `.txt` and `.md` files from the `data/` directory
+2. Reads all `.txt` and `.md` files from the directory specified in `dataPath` (default: `shared/assets/data/`)
 3. Splits each document into chunks of `chunkSize` characters with `chunkOverlap` overlap
 4. Generates embeddings for each chunk using the specified embedding model
 5. Stores chunks and embeddings in an in-memory vector store
@@ -154,6 +154,28 @@ The system will:
 - Display the answer
 
 Type `exit` to quit the interactive session.
+
+### Validation Scenario
+
+To verify that ingestion and querying work correctly, use this validation scenario:
+
+**Setup**: Ensure you have ingested documents (run `pnpm run ingest`).
+
+**Test Query**: "What is Nike's revenue strategy?"
+
+**Expected Behavior**:
+1. The system should retrieve relevant chunks from the Nike annual report (default sample document)
+2. Similarity scores should be logged (typically 0.7-0.9 for relevant chunks)
+3. The answer should mention revenue-related strategies from the document
+4. The logs should show:
+   - Query embedding generation
+   - Retrieval results with scores
+   - Answer generation status
+
+**Verification**: Check the logs for:
+- Retrieval scores and chunk counts
+- Answer generation status
+- The answer should be grounded in the retrieved document content
 
 ### Testing
 
@@ -256,8 +278,10 @@ Query → Embedding → Similarity Search → Top-K Chunks → LLM Prompt → An
 
 After understanding this basic RAG implementation, explore other projects:
 
-- **`projects/rerank/`**: Adds a reranking step to improve retrieval quality
-- **`projects/query-rewrite/`**: Implements query transformation techniques like HyDE
+- **`projects/query-transform/`**: Implements query transformation techniques (rewriting, step-back prompting, sub-query decomposition)
+- **`projects/reliable-rag/`**: Adds validation layers to improve retrieval quality
+- **`projects/hyde/`**: Uses hypothetical document generation for better query matching
+- **`projects/hype/`**: Pre-generates hypothetical questions during ingestion
 
 Each project builds upon the concepts demonstrated here while introducing new techniques.
 

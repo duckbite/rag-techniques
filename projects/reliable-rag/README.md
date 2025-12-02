@@ -41,6 +41,52 @@ Reliable RAG demonstrates how to harden retrieval before handing context to an L
 
 - **For better precision**: Decrease `topK` (e.g., 3-4) to focus on only the most similar chunks, reducing noise in validation.
 
+## Process Diagrams
+
+Reliable RAG adds a validation layer to the query process:
+
+### Ingestion Process
+
+The ingestion process follows the standard RAG pattern:
+
+```mermaid
+flowchart LR
+    A[Documents] --> B[Chunking]
+    B --> C[Embedding]
+    C --> D[(Vector Store)]
+    
+    style A fill:#e1f5ff
+    style B fill:#e1f5ff
+    style C fill:#e1f5ff
+    style D fill:#f0f0f0,stroke:#01579b,stroke-width:2px
+```
+
+### Query Process with Validation
+
+```mermaid
+flowchart LR
+    E[User Query] --> F[Query Embedding]
+    F --> G[Similarity Search]
+    G --> H[Candidate Chunks<br/>Top-K retrieved]
+    H --> I[Validation<br/>Similarity + Lexical]
+    I --> J{Passes<br/>Threshold?}
+    J -->|Yes| K[Highlighted Excerpt]
+    J -->|No| L[Fallback<br/>Top chunk<br/>Low confidence]
+    K --> M[LLM Generation]
+    L --> M
+    M --> N[Final Answer]
+    
+    VStore[(Vector Store)] -.->|Retrieve| G
+    
+    style E fill:#fff4e1
+    style I fill:#ffebee
+    style J fill:#ffebee
+    style K fill:#e8f5e9
+    style L fill:#fff3e0
+    style N fill:#fff4e1
+    style VStore fill:#f0f0f0,stroke:#01579b,stroke-width:2px
+```
+
 ## Configuration (`config/reliable-rag.config.json`)
 
 | Field | Description |
@@ -58,7 +104,7 @@ Example:
   "topK": 4,
   "embeddingModel": "text-embedding-3-small",
   "chatModel": "gpt-4o-mini",
-  "dataPath": "data",
+  "dataPath": "../../shared/assets/data",
   "indexPath": ".tmp/index/reliable-rag.index.json",
   "relevanceThreshold": 0.35,
   "highlightWindow": 120
@@ -72,7 +118,7 @@ pnpm install
 export OPENAI_API_KEY=sk-your-key
 
 cd projects/reliable-rag
-pnpm run ingest   # builds the vector index from data/*.txt|md
+pnpm run ingest   # builds the vector index from shared/assets/data/*.txt|md
 pnpm run query    # launches the validation-aware CLI
 ```
 
@@ -86,7 +132,7 @@ After running `pnpm run ingest` and `pnpm run query`, try:
 > How did water usage change at the Portland campus?
 ```
 
-Given the default `data/operations_update.txt`, you should see:
+Given the default `shared/assets/data/operations_update.txt`, you should see:
 
 - A validated chunk mentioning an **18%** drop in water usage at the Portland campus
 - An answer that clearly states something like:  
@@ -107,6 +153,47 @@ The system should either return low-confidence chunks or explicitly answer that 
 - **Highlighting**: the first matching keyword is wrapped by `highlightWindow` characters to provide immediate transparency.
 
 These heuristics run locally, so you can mock them in tests without additional API calls.
+
+## Understanding the Code
+
+### Key Components
+
+1. **`src/ingest.ts`**: Document ingestion pipeline
+   - Reuses the basic RAG ingestion process (document reading, chunking, embedding)
+   - No validation-specific processing during ingestion
+   - Standard vector index creation
+
+2. **`src/query.ts`**: Query pipeline with validation
+   - `validateRetrievedChunks()`: Validates chunks using dual criteria (similarity + lexical overlap)
+   - `tokenizeQuestion()`: Extracts meaningful keywords from questions for lexical matching
+   - `extractExcerpt()`: Extracts highlighted text around matching keywords
+   - `answerQuestion()`: Main query function that applies validation before generation
+   - Interactive CLI for querying with validation feedback
+
+3. **Shared Utilities** (in `shared/typescript/utils/`):
+   - `vectorStore.ts`: Vector storage and similarity search
+   - `llm.ts`: OpenAI client wrappers for embeddings and chat
+   - `config.ts`: Configuration loading and validation
+   - `types.ts`: TypeScript type definitions
+
+### Algorithm Overview
+
+**Validation Pipeline**:
+1. **Retrieve**: Get top-K chunks using standard semantic similarity search
+2. **Validate Each Chunk**: For each retrieved chunk, check:
+   - **Similarity Threshold**: Does cosine similarity >= `relevanceThreshold`? (default 0.35)
+   - **Lexical Overlap**: Do >= 40% of question keywords appear in the chunk?
+   - A chunk passes if it meets **either** criterion
+3. **Extract Excerpts**: For validated chunks, extract text window around first matching keyword
+4. **Fallback**: If no chunks pass validation, include top-scoring chunk with low-confidence flag
+5. **Generate**: Use validated chunks (or fallback) to generate answer
+
+**Validation Logic**:
+- **Keyword Tokenization**: Filters words >= 4 characters, removes stop words
+- **Overlap Calculation**: Percentage of question keywords found in chunk
+- **Threshold Check**: Chunk validated if similarity >= threshold OR overlap >= 0.4
+
+**Key Insight**: Dual-criteria validation catches false positives that pure semantic search might miss, improving answer reliability and providing transparency into why chunks were selected.
 
 ## Testing
 

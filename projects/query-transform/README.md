@@ -88,6 +88,49 @@ This provides the most comprehensive retrieval but is more expensive (multiple L
 - **For cost optimization**: Use a smaller model like `gpt-4o-mini` for `transformationModel`
 - **For quality optimization**: Use `gpt-4o` for `transformationModel` to get better transformations
 
+## Process Diagrams
+
+Query Transform applies transformations to queries before retrieval:
+
+### Ingestion Process
+
+The ingestion process follows the standard RAG pattern:
+
+```mermaid
+flowchart LR
+    A[Documents] --> B[Chunking]
+    B --> C[Embedding]
+    C --> D[(Vector Store)]
+    
+    style A fill:#e1f5ff
+    style B fill:#e1f5ff
+    style C fill:#e1f5ff
+    style D fill:#f0f0f0,stroke:#01579b,stroke-width:2px
+```
+
+### Query Process with Transformations
+
+```mermaid
+flowchart LR
+    E[User Query] --> F[Transform Query<br/>Rewrite/Step-back/Decompose]
+    F --> G[Embed Transformed<br/>Query/queries]
+    G --> H[Similarity Search<br/>Per transformed query]
+    H --> I{Merge Results<br/>Deduplicate}
+    I --> J[Top-K Chunks<br/>Combined results]
+    J --> K[LLM Generation<br/>Context + Query]
+    K --> L[Final Answer]
+    
+    VStore[(Vector Store)] -.->|Retrieve| H
+    
+    style E fill:#fff4e1
+    style F fill:#fff4e1
+    style G fill:#fff4e1
+    style I fill:#ffebee
+    style J fill:#fff4e1
+    style L fill:#fff4e1
+    style VStore fill:#f0f0f0,stroke:#01579b,stroke-width:2px
+```
+
 ## Configuration
 
 The project is configured via `config/query-transform.config.json`:
@@ -99,7 +142,7 @@ The project is configured via `config/query-transform.config.json`:
   "topK": 4,
   "embeddingModel": "text-embedding-3-small",
   "chatModel": "gpt-4o-mini",
-  "dataPath": "data",
+  "dataPath": "../../shared/assets/data",
   "indexPath": ".tmp/index/query-transform.index.json",
   "transformationType": "all",
   "transformationModel": "gpt-4o-mini",
@@ -115,7 +158,7 @@ The project is configured via `config/query-transform.config.json`:
 - `topK`: Number of chunks to retrieve (default: 4)
 - `embeddingModel`: OpenAI embedding model (default: "text-embedding-3-small")
 - `chatModel`: LLM for answer generation (default: "gpt-4o-mini")
-- `dataPath`: Path to documents directory (default: "data")
+- `dataPath`: Path to documents directory (default: "../../shared/assets/data")
 - `indexPath`: Path to vector index file (default: ".tmp/index/query-transform.index.json")
 
 **Query Transform Specific Parameters**:
@@ -151,7 +194,7 @@ The project is configured via `config/query-transform.config.json`:
    ```
 
 3. **Prepare sample data**:
-   Place `.txt` or `.md` files in the `data/` directory. You can copy sample data from `projects/basic-rag/data/`.
+   The project uses sample data from `shared/assets/data/` by default (configured via `dataPath`). You can modify `dataPath` to point to your own document directory.
 
 ## Usage
 
@@ -166,7 +209,7 @@ pnpm run ingest
 
 **What happens during ingestion:**
 1. Loads configuration from `config/query-transform.config.json`
-2. Reads all `.txt` and `.md` files from the `data/` directory
+2. Reads all `.txt` and `.md` files from the directory specified in `dataPath` (default: `shared/assets/data/`)
 3. Splits documents into chunks with configurable size and overlap
 4. Generates embeddings for each chunk
 5. Stores chunks and embeddings in a vector store

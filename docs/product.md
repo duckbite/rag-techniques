@@ -27,7 +27,7 @@ Since these projects are for learning, comprehensive documentation is required f
 The main `README.md` file contains the following:
 
 - Project Description and rationale
-- Diagram of a RAG system and short explanation of the various elements in the system.
+- **Separate Mermaid diagrams** for document ingestion and query processing, with short explanations of the various elements in each process
 - Project Structure
 - Prerequisites
 - Table with projects, including name, description, what the project demonstrates and link to project README.
@@ -71,6 +71,7 @@ Each project in `projects/` must include a `README.md` file that contains:
    - Overview of key components and their roles
    - High-level explanation of the algorithm/pipeline
    - How the technique works conceptually
+   - **Mermaid diagrams** for ingestion and query processes if they differ from the basic RAG process shown in the main README (required for projects with unique processing steps like CSV-RAG, proposition-chunking, HyDE, HyPE, query-transform, reliable-rag, etc.)
 
 7. **Troubleshooting**:
    - Common errors and their solutions
