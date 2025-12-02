@@ -30,8 +30,22 @@ This document describes the high-level folder layout for the TypeScript RAG Tech
     - `config/proposition-chunking.config.json` – Configures proposition/grading models and thresholds.
     - `src/ingest.ts` – Creates propositions per chunk and persists high-scoring statements.
     - `src/query.ts` – Answers questions using proposition-level retrieval while showing the original excerpt.
-  - `rerank/` – RAG with reranking of retrieved documents.
-  - `query-rewrite/` – RAG variants that rewrite or expand queries before retrieval.
+  - `query-transform/` – Query transformation techniques (rewriting, step-back, decomposition).
+    - `config/query-transform.config.json` – Configures transformation type and model settings.
+    - `src/queryTransform.ts` – Core transformation functions (rewrite, step-back, decompose).
+    - `src/ingest.ts` – Reuses standard ingestion pipeline.
+    - `src/query.ts` – Applies transformations to queries before retrieval.
+  - `hyde/` – Hypothetical Document Embedding (runtime document generation).
+    - `config/hyde.config.json` – Configures HyDE model and target document length.
+    - `src/hyde.ts` – Generates hypothetical documents answering queries.
+    - `src/ingest.ts` – Reuses standard ingestion pipeline.
+    - `src/query.ts` – Uses hypothetical document embeddings for retrieval.
+  - `hype/` – Hypothetical Prompt Embedding (offline question generation).
+    - `config/hype.config.json` – Configures question generation model and questions per chunk.
+    - `src/hype.ts` – Generates hypothetical questions for chunks.
+    - `src/vectorStore.ts` – Enhanced vector store supporting multiple embeddings per chunk.
+    - `src/ingest.ts` – Enhanced ingestion with question generation and multi-embedding storage.
+    - `src/query.ts` – Matches queries against question embeddings.
 - `logs/`
   - `decision-log.md` – Running record of cross-cutting decisions (runtime data location, documentation requirements, sample data usage, etc.).
 - `shared/`
@@ -42,10 +56,12 @@ This document describes the high-level folder layout for the TypeScript RAG Tech
       - `llm.ts` – LLM and embedding client interfaces + OpenAI implementation.
       - `types.ts` – Core domain types (`Document`, `Chunk`, etc.).
       - `vectorStore.ts` – Simple in-memory vector store and retrieval utilities.
+      - `evaluation.ts` – Simple evaluation helpers (answer comparison, retrieval scoring).
   - `schemas/`
     - `jsonschema/`
       - `config.schema.json` – JSON Schema for per-project config files.
   - `assets/`
+    - `data/` – Centralized sample documents reused across all RAG projects (e.g., Nike annual report, `Understanding_Climate_Change.pdf`, CSVs).
     - `sample/` – Example documents / datasets for demos (to be populated per project).
 
 This file should be updated whenever new top-level folders or significant shared modules are added or removed.

@@ -19,18 +19,18 @@ This document tracks parity work as we port the 34 techniques from [`NirDiamant/
 
 | Status | Project Folder | Technique | Source Notebook | Notes / Dependencies |
 | --- | --- | --- | --- | --- |
-| ⏳ | `projects/csv-rag` | RAG over CSV files | `all_rag_techniques/simple_csv_rag.ipynb` | Reuse ingestion pipeline with CSV loader + schema inference. Ensure README covers CSV preparation. |
-| ⏳ | `projects/reliable-rag` | Reliable RAG | `all_rag_techniques/reliable_rag.ipynb` | Adds retrieval validation & answer highlighting. Depends on shared evaluation utilities. |
-| ⏳ | `projects/chunk-optimizer` | Choose chunk size | `all_rag_techniques/choose_chunk_size.ipynb` | Provide CLI to benchmark chunk sizes; needs plotting or tabular output. |
-| ⏳ | `projects/proposition-chunking` | Proposition chunking | `all_rag_techniques/proposition_chunking.ipynb` | Requires LLM-assisted proposition generation, quality grading, and persistence of graded propositions. |
+| ✅ | `projects/csv-rag` | RAG over CSV files | `all_rag_techniques/simple_csv_rag.ipynb` | Reuse ingestion pipeline with CSV loader + schema inference. Ensure README covers CSV preparation. |
+| ✅ | `projects/reliable-rag` | Reliable RAG | `all_rag_techniques/reliable_rag.ipynb` | Adds retrieval validation & answer highlighting. Depends on shared evaluation utilities. |
+| ✅ | `projects/chunk-optimizer` | Choose chunk size | `all_rag_techniques/choose_chunk_size.ipynb` | Provide CLI to benchmark chunk sizes; needs plotting or tabular output. |
+| ✅ | `projects/proposition-chunking` | Proposition chunking | `all_rag_techniques/proposition_chunking.ipynb` | Requires LLM-assisted proposition generation, quality grading, and persistence of graded propositions. |
 
 ## Phase 2 — Query Enhancement (Dec 2025)
 
 | Status | Project Folder | Technique | Source Notebook | Notes / Dependencies |
 | --- | --- | --- | --- | --- |
-| ⏳ | `projects/query-transform` | Query transformations | `all_rag_techniques/query_transformations.ipynb` | Implement query rewriting, step-back prompting, and sub-query decomposition. |
-| ⏳ | `projects/hyde` | HyDE (Hypothetical Document Embedding) | `all_rag_techniques/HyDe_Hypothetical_Document_Embedding.ipynb` | Requires runtime synthetic document generation per query; depends on shared LLM utilities. |
-| ⏳ | `projects/hype` | HyPE (Hypothetical Prompt Embedding) | `all_rag_techniques/HyPE_Hypothetical_Prompt_Embeddings.ipynb` | Needs offline generation of hypothetical prompts during ingestion and new retrieval pipeline. |
+| ✅ | `projects/query-transform` | Query transformations | `all_rag_techniques/query_transformations.ipynb` | Implements query rewriting, step-back prompting, and sub-query decomposition. Supports all transformation types individually or combined. |
+| ✅ | `projects/hyde` | HyDE (Hypothetical Document Embedding) | `all_rag_techniques/HyDe_Hypothetical_Document_Embedding.ipynb` | Uses runtime synthetic document generation per query. Embeds hypothetical documents instead of queries for improved retrieval. |
+| ✅ | `projects/hype` | HyPE (Hypothetical Prompt Embedding) | `all_rag_techniques/HyPE_Hypothetical_Prompt_Embeddings.ipynb` | Pre-generates hypothetical questions during ingestion. Enhanced vector store supports multiple embeddings per chunk. Question-question matching at query time. |
 
 ## Phase 3 — Context Enrichment (Dec 2025 – Jan 2026)
 

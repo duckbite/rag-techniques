@@ -9,7 +9,12 @@
     "embeddingModel": { "type": "string" },
     "chatModel": { "type": "string" },
     "dataPath": { "type": "string" },
-    "indexPath": { "type": "string" }
+    "indexPath": { "type": "string" },
+    "documentTitles": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Optional whitelist of document filenames to ingest from dataPath"
+    }
   },
   "required": [
     "chunkSize",

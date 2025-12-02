@@ -330,7 +330,16 @@ export async function runPropositionIngestion(
   const embeddingClient = deps.embeddingClient ?? new OpenAIEmbeddingClient(cfg.embeddingModel);
   const vectorStore = deps.vectorStore ?? new InMemoryVectorStore();
 
-  const documents = readDocs(cfg.dataPath);
+  let documents = readDocs(cfg.dataPath);
+  if (cfg.documentTitles && cfg.documentTitles.length > 0) {
+    const before = documents.length;
+    documents = documents.filter((d) => d.title && cfg.documentTitles!.includes(d.title));
+    logger.info("Filtered documents by title", {
+      totalLoaded: before,
+      allowedTitles: cfg.documentTitles,
+      kept: documents.length
+    });
+  }
   const chunks = documents.flatMap((doc) => chunker(doc, cfg));
   logger.info("Generated document chunks", { count: chunks.length });
 

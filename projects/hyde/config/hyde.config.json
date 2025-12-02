@@ -5,10 +5,11 @@
   "embeddingModel": "text-embedding-3-small",
   "chatModel": "gpt-4o-mini",
   "dataPath": "../../shared/assets/data",
-  "indexPath": ".tmp/index/basic-rag.index.json",
+  "indexPath": ".tmp/index/hyde.index.json",
+  "hydeModel": "gpt-4o-mini",
+  "targetDocumentLength": 800,
   "documentTitles": [
     "nike_2023_annual_report.txt"
   ]
 }
-
 

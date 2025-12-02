@@ -5,10 +5,12 @@
   "embeddingModel": "text-embedding-3-small",
   "chatModel": "gpt-4o-mini",
   "dataPath": "../../shared/assets/data",
-  "indexPath": ".tmp/index/basic-rag.index.json",
+  "indexPath": ".tmp/index/query-transform.index.json",
+  "transformationType": "all",
+  "transformationModel": "gpt-4o-mini",
+  "maxSubQueries": 4,
   "documentTitles": [
     "nike_2023_annual_report.txt"
   ]
 }
-
 

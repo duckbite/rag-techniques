@@ -31,6 +31,12 @@ export interface RagConfig {
   chatModel: string;
   dataPath: string;
   indexPath: string;
+  /**
+   * Optional whitelist of document titles to ingest from dataPath.
+   * If provided, ingestion pipelines will filter loaded documents
+   * to only those whose `title` matches one of these strings.
+   */
+  documentTitles?: string[];
 }
 
 

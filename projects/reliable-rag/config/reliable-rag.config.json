@@ -4,8 +4,11 @@
   "topK": 10,
   "embeddingModel": "text-embedding-3-small",
   "chatModel": "gpt-4o-mini",
-  "dataPath": "data",
+  "dataPath": "../../shared/assets/data",
   "indexPath": ".tmp/index/reliable-rag.index.json",
   "relevanceThreshold": 0.25,
-  "highlightWindow": 120
+  "highlightWindow": 120,
+  "documentTitles": [
+    "operations_update.txt"
+  ]
 }

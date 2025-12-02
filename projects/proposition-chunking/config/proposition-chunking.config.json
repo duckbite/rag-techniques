@@ -4,10 +4,13 @@
   "topK": 6,
   "embeddingModel": "text-embedding-3-small",
   "chatModel": "gpt-4o-mini",
-  "dataPath": "data",
+  "dataPath": "../../shared/assets/data",
   "indexPath": ".tmp/index/proposition-chunking.index.json",
   "propositionModel": "gpt-4o-mini",
   "gradingModel": "gpt-4o-mini",
   "maxPropositions": 5,
-  "gradingThreshold": 0.6
+  "gradingThreshold": 0.6,
+  "documentTitles": [
+    "product_strategy.txt"
+  ]
 }

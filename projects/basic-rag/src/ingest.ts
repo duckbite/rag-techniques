@@ -60,7 +60,16 @@ export async function runIngestion(
   const vectorStore = deps.vectorStore ?? new InMemoryVectorStore();
 
   logger.info("Reading documents", { dataPath: cfg.dataPath });
-  const documents = readDocs(cfg.dataPath);
+  let documents = readDocs(cfg.dataPath);
+  if (cfg.documentTitles && cfg.documentTitles.length > 0) {
+    const before = documents.length;
+    documents = documents.filter((d) => d.title && cfg.documentTitles!.includes(d.title));
+    logger.info("Filtered documents by title", {
+      totalLoaded: before,
+      allowedTitles: cfg.documentTitles,
+      kept: documents.length
+    });
+  }
   logger.info("Loaded documents", {
     count: documents.length,
     titles: documents.map((d) => d.title)

@@ -52,7 +52,25 @@ importers:
         specifier: ^4.0.14
         version: 4.0.14(@types/node@22.19.1)
 
+  projects/hyde:
+    devDependencies:
+      vitest:
+        specifier: ^4.0.14
+        version: 4.0.14(@types/node@22.19.1)
+
+  projects/hype:
+    devDependencies:
+      vitest:
+        specifier: ^4.0.14
+        version: 4.0.14(@types/node@22.19.1)
+
   projects/proposition-chunking:
+    devDependencies:
+      vitest:
+        specifier: ^4.0.14
+        version: 4.0.14(@types/node@22.19.1)
+
+  projects/query-transform:
     devDependencies:
       vitest:
         specifier: ^4.0.14
