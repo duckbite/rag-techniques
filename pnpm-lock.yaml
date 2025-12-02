@@ -82,6 +82,12 @@ importers:
         specifier: ^4.0.14
         version: 4.0.14(@types/node@22.19.1)
 
+  shared/typescript/utils:
+    devDependencies:
+      vitest:
+        specifier: ^4.0.14
+        version: 4.0.14(@types/node@22.19.1)
+
 packages:
 
   '@cspotcode/source-map-support@0.8.1':
