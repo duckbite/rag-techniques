@@ -1,13 +1,17 @@
 {
-    "name": "@shared/typescript-utils",
-    "version": "0.1.0",
-    "private": true,
-    "type": "commonjs",
-    "scripts": {
-      "test": "vitest run",
-      "test:watch": "vitest watch"
-    },
-    "devDependencies": {
-      "vitest": "^4.0.14"
-    }
+  "name": "@shared/typescript-utils",
+  "version": "0.1.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest watch"
+  },
+  "devDependencies": {
+    "@types/prettyjson": "^0.0.33",
+    "vitest": "^4.0.14"
+  },
+  "dependencies": {
+    "prettyjson": "^1.2.5"
   }
+}

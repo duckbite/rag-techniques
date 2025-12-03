@@ -98,7 +98,7 @@ All projects must include extensive logging during ingestion and query operation
 3. **Summary Requirements**:
    - End-of-ingestion summary: total counts, success/failure rates, key metrics
    - Per-query summary: retrieval quality, validation results (if applicable), answer generation status
-   - Use structured logging (JSON format via the logger) for easy parsing and analysis
+   - Use the shared logger for **pretty, human-friendly CLI logging** (timestamp + colored levels) while still including structured `meta` details as JSON on a second line when needed
 
 4. **Log Level Behavior**:
    - `LOG_LEVEL=info`: Full detailed logging including summaries

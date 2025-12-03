@@ -1,6 +1,12 @@
+import prettyjson from "prettyjson";
+
 type LogLevel = "debug" | "info" | "warn" | "error";
 
 const LOG_LEVELS: LogLevel[] = ["debug", "info", "warn", "error"];
+
+const prettyJsonOptions = {
+  noColor: false
+};
 
 function currentLevel(): LogLevel {
   const level = (process.env.LOG_LEVEL ?? "info").toLowerCase() as LogLevel;
@@ -11,18 +17,38 @@ function levelToIndex(level: LogLevel): number {
   return LOG_LEVELS.indexOf(level);
 }
 
+function colorize(level: LogLevel, text: string): string {
+  const RESET = "\x1b[0m";
+
+  const COLORS: Record<LogLevel, string> = {
+    debug: "\x1b[90m", // bright black / gray
+    info: "\x1b[36m", // cyan
+    warn: "\x1b[33m", // yellow
+    error: "\x1b[31m" // red
+  };
+
+  const color = COLORS[level];
+  return `${color}${text}${RESET}`;
+}
+
 function log(level: LogLevel, message: string, meta?: unknown): void {
   if (levelToIndex(level) < levelToIndex(currentLevel())) return;
 
-  const payload = {
-    level,
-    message,
-    time: new Date().toISOString(),
-    ...(meta ? { meta } : {})
-  };
+  const time = new Date().toISOString();
+
+  const coloredLevel = colorize(level, level.toUpperCase());
 
   // eslint-disable-next-line no-console
-  console.log(JSON.stringify(payload));
+  console.log(`[${time}] [${coloredLevel}] ${message}`);
+
+  if (meta !== undefined) {
+    const metaString =
+      typeof meta === "string" ? meta : JSON.stringify(meta, null, 2);
+    console.log(`${prettyjson.render(meta, prettyJsonOptions)}\n`);  
+    // console.log(`\n  ${metaString}`);
+  }
+
+
 }
 
 export const logger = {
