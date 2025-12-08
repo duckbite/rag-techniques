@@ -1,7 +1,25 @@
 # rag-techniques
 
-Typescript port of https://github.com/NirDiamant/RAG_Techniques
+This project ports Nir Diamant’s RAG Techniques repo (https://github.com/NirDiamant/RAG_Techniques) to TypeScript to make the patterns and building blocks accessible and practical in a modern JavaScript/TypeScript stack, not just in Python-centric environments.
 
+## Rationale
+1. Align RAG patterns with the JavaScript/TypeScript ecosystem. A lot of production systems, especially web and serverless backends, are already running on Node.js / Deno. Porting the repo means these RAG techniques can be used directly in that ecosystem without needing a separate Python service.
+2. End-to-end type safety. TypeScript gives compile-time validation of data structures across the whole RAG pipeline: document loaders, chunking, embeddings, vector search, and LLM calls. This reduces subtle runtime errors and makes refactors safer.
+3. Isomorphic code reuse (client, server, edge). With TypeScript you can share core logic across:
+- Backend APIs (Node, serverless functions)
+- Frontend apps (React, Next.js, etc.)
+- Edge runtimes (Cloudflare Workers, Vercel Edge, etc.)That makes it easier to experiment with where RAG logic lives and to move pieces between client and server without a full rewrite.
+4. Easier integration with existing TS-based systems. Many existing codebases already use TypeScript for domain logic, APIs, infra orchestration and SDKs (databases, queues, storage). Having the RAG techniques in TypeScript lets them integrate as first-class modules rather than an isolated Python service.
+5. Broader developer reachJavaScript/TypeScript has a very large developer base. A TS port lowers the barrier for:
+- Web developers who know JS/TS but not Python
+- Teams who want to prototype and deploy quickly using their existing skillsThis amplifies the impact of Nir’s original work by opening it to another big community.
+6. Ecosystem and tooling benefits. TypeScript works well with:
+- Modern bundlers and build tools
+- Linting and formatting standards
+- Typed SDKs for vector databases, LLM providers, and cloud platformsThe result is a RAG codebase that fits naturally into current JS tooling and CI/CD workflows.
+
+
+## Requirements
 - uses typescript instead of python
 - each subproject has a README.md file explaining what it does and how to use it
 - instead of one long notebook divide into various scripts / functions per project responsible for a single task or task group (e.g. db initialization, creating embeddings and inserting items in db, read from db, perform analysis, etc.). Make this a logical distribution per project.

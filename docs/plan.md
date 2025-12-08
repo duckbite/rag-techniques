@@ -15,7 +15,7 @@ This document tracks parity work as we port the 34 techniques from [`NirDiamant/
 | --- | --- | --- | --- | --- |
 | ✅ | `projects/basic-rag` | Basic RAG baseline | `all_rag_techniques/simple_rag.ipynb` | Provides ingestion/query scripts, Vitest coverage, and detailed README. Acts as reference architecture for remaining work. |
 
-## Phase 1 — Foundational Parity (Nov–Dec 2025)
+## Phase 1 — Foundational Parity
 
 | Status | Project Folder | Technique | Source Notebook | Notes / Dependencies |
 | --- | --- | --- | --- | --- |
@@ -24,7 +24,7 @@ This document tracks parity work as we port the 34 techniques from [`NirDiamant/
 | ✅ | `projects/chunk-optimizer` | Choose chunk size | `all_rag_techniques/choose_chunk_size.ipynb` | Provide CLI to benchmark chunk sizes; needs plotting or tabular output. |
 | ✅ | `projects/proposition-chunking` | Proposition chunking | `all_rag_techniques/proposition_chunking.ipynb` | Requires LLM-assisted proposition generation, quality grading, and persistence of graded propositions. |
 
-## Phase 2 — Query Enhancement (Dec 2025)
+## Phase 2 — Query Enhancement
 
 | Status | Project Folder | Technique | Source Notebook | Notes / Dependencies |
 | --- | --- | --- | --- | --- |
@@ -32,7 +32,7 @@ This document tracks parity work as we port the 34 techniques from [`NirDiamant/
 | ✅ | `projects/hyde` | HyDE (Hypothetical Document Embedding) | `all_rag_techniques/HyDe_Hypothetical_Document_Embedding.ipynb` | Uses runtime synthetic document generation per query. Embeds hypothetical documents instead of queries for improved retrieval. |
 | ✅ | `projects/hype` | HyPE (Hypothetical Prompt Embedding) | `all_rag_techniques/HyPE_Hypothetical_Prompt_Embeddings.ipynb` | Pre-generates hypothetical questions during ingestion. Enhanced vector store supports multiple embeddings per chunk. Question-question matching at query time. |
 
-## Phase 3 — Context Enrichment (Dec 2025 – Jan 2026)
+## Phase 3 — Context Enrichment
 
 | Status | Project Folder | Technique | Source Notebook | Notes / Dependencies |
 | --- | --- | --- | --- | --- |
@@ -43,7 +43,7 @@ This document tracks parity work as we port the 34 techniques from [`NirDiamant/
 | ✅ | `projects/contextual-compression` | Contextual compression | `all_rag_techniques/contextual_compression.ipynb` | Runs shared compression helper to summarize/filter retrieved chunks before answering. |
 | ✅ | `projects/document-augmentation` | Document augmentation via question generation | `all_rag_techniques/document_augmentation.ipynb` | Generates synthetic Q/A pairs per chunk during ingestion and stores them alongside base chunks. |
 
-## Phase 4 — Advanced Retrieval (Jan–Feb 2026)
+## Phase 4 — Advanced Retrieval
 
 | Status | Project Folder | Technique | Source Notebook | Notes / Dependencies |
 | --- | --- | --- | --- | --- |
@@ -55,7 +55,7 @@ This document tracks parity work as we port the 34 techniques from [`NirDiamant/
 | ⏳ | `projects/dartboard` | Dartboard retrieval | `all_rag_techniques/dartboard.ipynb` | Implements dartboard-style multi-stage retrieval windows. |
 | ⏳ | `projects/multimodal-captioning` | Multi-modal RAG with captioning | `all_rag_techniques/multi_model_rag_with_captioning.ipynb` | Introduce image loader + captioning pipeline; dependency on vision models. |
 
-## Phase 5 — Iterative Retrieval & Evaluation (Feb 2026)
+## Phase 5 — Iterative Retrieval & Evaluation
 
 | Status | Project Folder | Technique | Source Notebook | Notes / Dependencies |
 | --- | --- | --- | --- | --- |
@@ -66,7 +66,7 @@ This document tracks parity work as we port the 34 techniques from [`NirDiamant/
 | ⏳ | `projects/grouse` | GroUSE evaluation | `evaluation/evaluation_grouse.ipynb` | Integrate GroUSE scoring; needs dataset format doc. |
 | ⏳ | `projects/explainable-retrieval` | Explainable retrieval | `all_rag_techniques/explainable_retrieval.ipynb` | Surfaces rationale + trace for each retrieved chunk. |
 
-## Phase 6 — Advanced Architectures & Agents (Mar 2026)
+## Phase 6 — Advanced Architectures & Agents
 
 | Status | Project Folder | Technique | Source Notebook | Notes / Dependencies |
 | --- | --- | --- | --- | --- |
