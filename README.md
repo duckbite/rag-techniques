@@ -176,6 +176,12 @@ The following table lists all available RAG technique projects. Each project dem
 | **query-transform** | Query transformation techniques | Query rewriting (adding specificity), step-back prompting (generating broader context queries), sub-query decomposition (breaking complex queries into simpler ones), and combining multiple transformation strategies. | [README](projects/query-transform/README.md) |
 | **hyde** | Hypothetical Document Embedding | Runtime synthetic document generation, embedding answers instead of questions, document-style query representation, and bridging the query-document semantic gap. | [README](projects/hyde/README.md) |
 | **hype** | Hypothetical Prompt Embedding | Offline question generation during ingestion, question-question matching instead of question-document matching, multiple embeddings per chunk for better coverage, and pre-computed retrieval enhancement. | [README](projects/hype/README.md) |
+| **chunk-headers** | Contextual chunk headers | Prepending document title and section metadata to each chunk before embedding, preserving hierarchical context in retrieval, and improving precision by retaining document structure. | [README](projects/chunk-headers/README.md) |
+| **relevant-segments** | Relevant segment extraction | Stitching adjacent retrieved chunks from the same document into longer, contiguous segments, reducing fragmentation and providing richer context windows for answer generation. | [README](projects/relevant-segments/README.md) |
+| **context-window** | Context window enhancement | Expanding retrieved chunks into configurable windows around top hits, providing surrounding context without inflating topK or changing chunking granularity. | [README](projects/context-window/README.md) |
+| **semantic-chunking** | Semantic chunking | Using paragraph-based, semantically coherent chunks instead of fixed-size windows, preserving meaning across boundaries and reducing mid-sentence breaks. | [README](projects/semantic-chunking/README.md) |
+| **contextual-compression** | Contextual compression | Summarizing and filtering retrieved chunks before answering, reducing token usage and noise while preserving answer-critical facts through LLM-based compression. | [README](projects/contextual-compression/README.md) |
+| **document-augmentation** | Document augmentation via question generation | Generating synthetic Q/A pairs per chunk during ingestion, storing augmented chunks alongside base chunks, and retrieving over both to improve query coverage and recall. | [README](projects/document-augmentation/README.md) |
 
 ### Project Roadmap
 
@@ -183,7 +189,8 @@ We are porting 34 techniques from the original [`NirDiamant/RAG_Techniques`](htt
 
 - **Phase 1 (Complete)**: Basic RAG, CSV RAG, Reliable RAG, Chunk Optimizer, Proposition Chunking
 - **Phase 2 (Complete)**: Query Transform, HyDE, HyPE
-- **Future Phases**: Context enrichment, advanced retrieval (fusion, reranking), evaluation frameworks, explainability, graph RAG, and agent architectures
+- **Phase 3 (Complete)**: Chunk Headers, Relevant Segments, Context Window, Semantic Chunking, Contextual Compression, Document Augmentation
+- **Future Phases**: Advanced retrieval (fusion, reranking), evaluation frameworks, explainability, graph RAG, and agent architectures
 
 See `docs/plan.md` for detailed planning and status of upcoming projects.
 
@@ -197,6 +204,13 @@ For beginners, we recommend this learning path:
 4. **Experiment with `reliable-rag`** - Understand validation techniques for improving answer quality
 5. **Advance to `query-transform`** - Learn how to improve retrieval by transforming queries
 6. **Compare `hyde` and `hype`** - Understand different approaches to bridging the query-document gap
+7. **Explore context enrichment (Phase 3)**:
+   - **`chunk-headers`** - Learn how to preserve document structure in chunks
+   - **`semantic-chunking`** - Understand paragraph-based vs fixed-size chunking
+   - **`relevant-segments`** - See how to stitch adjacent chunks for richer context
+   - **`context-window`** - Learn to expand context around retrieved chunks
+   - **`contextual-compression`** - Understand how to compress context before answering
+   - **`document-augmentation`** - Explore synthetic Q/A generation for better retrieval
 
 Each project builds upon concepts introduced in previous ones while introducing new techniques you can apply to your own RAG systems.
 
