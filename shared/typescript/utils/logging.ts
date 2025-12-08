@@ -42,12 +42,8 @@ function log(level: LogLevel, message: string, meta?: unknown): void {
   console.log(`[${time}] [${coloredLevel}] ${message}`);
 
   if (meta !== undefined) {
-    const metaString =
-      typeof meta === "string" ? meta : JSON.stringify(meta, null, 2);
-    console.log(`${prettyjson.render(meta, prettyJsonOptions)}\n`);  
-    // console.log(`\n  ${metaString}`);
+    console.log(`${prettyjson.render(meta, prettyJsonOptions)}\n`);
   }
-
 
 }
 

@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { simpleChunkDocument } from "../chunking";
+import {
+  createDocumentHeader,
+  prependHeaderToChunks,
+  semanticChunkDocument,
+  simpleChunkDocument
+} from "../chunking";
 import { Document, ChunkingConfig } from "../types";
 
 describe("simpleChunkDocument", () => {
@@ -147,6 +152,71 @@ describe("simpleChunkDocument", () => {
       chunkOverlap: 5
     };
 
-    expect(() => simpleChunkDocument(doc, cfg)).toThrow("chunkOverlap must be smaller than chunkSize");
+    expect(() => simpleChunkDocument(doc, cfg)).toThrow(
+      "chunkOverlap must be smaller than chunkSize"
+    );
   });
 });
+
+describe("createDocumentHeader", () => {
+  it("creates header with title only when no metadata", () => {
+    const doc: Document = {
+      id: "doc-0",
+      content: "content",
+      title: "My Doc"
+    };
+    const header = createDocumentHeader(doc);
+    expect(header).toBe("Title: My Doc");
+  });
+
+  it("includes section and category when present", () => {
+    const doc: Document = {
+      id: "doc-0",
+      content: "content",
+      title: "My Doc",
+      metadata: {
+        section: "Chapter 1",
+        category: "Finance"
+      }
+    };
+    const header = createDocumentHeader(doc);
+    expect(header).toContain("Title: My Doc");
+    expect(header).toContain("Section: Chapter 1 / Finance");
+  });
+});
+
+describe("prependHeaderToChunks", () => {
+  it("prepends header to each chunk content", () => {
+    const chunks = [
+      { id: "c1", documentId: "doc-0", content: "A", index: 0 },
+      { id: "c2", documentId: "doc-0", content: "B", index: 1 }
+    ];
+    const result = prependHeaderToChunks(chunks, "Title: Test");
+    expect(result[0].content.startsWith("Title: Test\n\nA")).toBe(true);
+    expect(result[1].content.startsWith("Title: Test\n\nB")).toBe(true);
+  });
+
+  it("returns original chunks when header is empty", () => {
+    const chunks = [
+      { id: "c1", documentId: "doc-0", content: "A", index: 0 }
+    ];
+    const result = prependHeaderToChunks(chunks, "   ");
+    expect(result).toEqual(chunks);
+  });
+});
+
+describe("semanticChunkDocument", () => {
+  it("splits document on blank lines", () => {
+    const doc: Document = {
+      id: "doc-0",
+      title: "test",
+      content: "Para 1 line\nstill para 1\n\nPara 2\n\n\nPara 3"
+    };
+    const cfg: ChunkingConfig = { chunkSize: 100, chunkOverlap: 0 };
+    const chunks = semanticChunkDocument(doc, cfg);
+    expect(chunks).toHaveLength(3);
+    expect(chunks[0].content).toContain("Para 1 line");
+    expect(chunks[1].content).toBe("Para 2");
+  });
+});
+

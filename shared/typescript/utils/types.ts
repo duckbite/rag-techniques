@@ -37,6 +37,33 @@ export interface RagConfig {
    * to only those whose `title` matches one of these strings.
    */
   documentTitles?: string[];
+  /**
+   * Optional context window size (in characters) used by projects that
+   * expand retrieved chunks into larger windows around relevant content.
+   */
+  contextWindowSize?: number;
+  /**
+   * Optional maximum size (in characters) for stitched segments used by
+   * relevant segment extraction logic.
+   */
+  segmentMaxChars?: number;
+  /**
+   * When true, indicates that ingestion should prefer semantic chunking
+   * (paragraph/sentence based) instead of fixed-size windows.
+   */
+  semanticChunking?: boolean;
+  /**
+   * Optional maximum size (in characters) for compressed context used by
+   * contextual compression techniques.
+   */
+  compressionMaxChars?: number;
+  /**
+   * Optional number of synthetic questions to generate per chunk for
+   * document-augmentation techniques.
+   */
+  questionsPerChunk?: number;
 }
+
+export type ChunkingConfig = Pick<RagConfig, "chunkSize" | "chunkOverlap">;
 
 

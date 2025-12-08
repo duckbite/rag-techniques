@@ -15,6 +15,13 @@ Typescript port of https://github.com/NirDiamant/RAG_Techniques
 - `projects/basic-rag` is complete and acts as the baseline for the remaining work.
 - **Phase 1 (Complete)**: `projects/csv-rag` adds structured CSV ingestion with automatic column inference. `projects/reliable-rag` validates retrieved chunks via similarity + lexical overlap. `projects/chunk-optimizer` benchmarks chunk sizes/overlaps. `projects/proposition-chunking` generates and grades LLM-derived propositions.
 - **Phase 2 (Complete)**: `projects/query-transform` implements query rewriting, step-back prompting, and sub-query decomposition. `projects/hyde` uses runtime hypothetical document generation for retrieval. `projects/hype` pre-generates hypothetical questions during ingestion for question-question matching.
+- **Phase 3 (Complete)**: Context enrichment techniques:
+  - `projects/chunk-headers` adds contextual headers (title/section metadata) to each chunk before embedding.
+  - `projects/relevant-segments` stitches adjacent retrieved chunks into longer segments to provide richer context windows.
+  - `projects/context-window` expands context around retrieved chunks using configurable window sizes.
+  - `projects/semantic-chunking` switches from fixed-size to paragraph-based semantic chunks.
+  - `projects/contextual-compression` compresses retrieved context with an LLM before answering.
+  - `projects/document-augmentation` generates synthetic Q/A pairs per chunk during ingestion and retrieves over both base and augmented chunks.
 - Active planning, sequencing, and status for each upcoming project now lives in `docs/plan.md`; update that file whenever scope, ordering, or ownership changes.
 - We will prioritize foundational techniques (CSV ingestion, reliable RAG, advanced chunking) before moving into query enhancement, context enrichment, advanced retrieval, evaluation, explainability, and graph/agent architectures to keep dependencies manageable.
 

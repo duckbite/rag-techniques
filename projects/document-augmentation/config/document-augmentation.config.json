@@ -1,0 +1,11 @@
+{
+  "chunkSize": 800,
+  "chunkOverlap": 200,
+  "topK": 4,
+  "embeddingModel": "text-embedding-3-small",
+  "chatModel": "gpt-4o-mini",
+  "dataPath": "../../shared/assets/data",
+  "indexPath": ".tmp/index/document-augmentation.index.json"
+}
+
+

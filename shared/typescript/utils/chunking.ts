@@ -1,4 +1,4 @@
-import { Chunk, Document, RagConfig } from "./types";
+import { Chunk, Document, RagConfig, RetrievedChunk } from "./types";
 
 /**
  * Configuration for document chunking.
@@ -66,6 +66,126 @@ export function simpleChunkDocument(doc: Document, cfg: ChunkingConfig): Chunk[]
     if (end === doc.content.length) break;
     index += chunkSize - chunkOverlap;
     chunkIndex += 1;
+  }
+
+  return chunks;
+}
+
+/**
+ * Builds a simple contextual header string for a document.
+ *
+ * The header is meant to be prepended to every chunk created from the
+ * document so that retrieval has access to high-level metadata such as
+ * title and section/category labels.
+ *
+ * Format:
+ * - Always includes a `Title: ...` line
+ * - Optionally includes a `Section: ...` line when `metadata.section`
+ *   or `metadata.category` are present
+ *
+ * @param doc - Source document
+ * @returns Multi-line header string
+ */
+export function createDocumentHeader(doc: Document): string {
+  const title = doc.title ?? "Untitled document";
+  const meta = doc.metadata ?? {};
+  const sections: string[] = [];
+
+  const sectionMeta = meta.section ?? meta.sectionTitle ?? meta.heading;
+  if (typeof sectionMeta === "string" && sectionMeta.trim().length > 0) {
+    sections.push(sectionMeta.trim());
+  }
+  const categoryMeta = meta.category ?? meta.topic;
+  if (typeof categoryMeta === "string" && categoryMeta.trim().length > 0) {
+    sections.push(categoryMeta.trim());
+  }
+
+  const lines = [`Title: ${title}`];
+  if (sections.length > 0) {
+    lines.push(`Section: ${sections.join(" / ")}`);
+  }
+  return lines.join("\n");
+}
+
+/**
+ * Prepends a contextual header string to each chunk's content.
+ *
+ * This is used by projects like `chunk-headers` to enrich chunk text
+ * with document-level metadata before embedding. The original chunk
+ * structure (id, documentId, index, metadata) is preserved.
+ *
+ * @param chunks - Base chunks created from a document
+ * @param header - Header string produced by {@link createDocumentHeader}
+ * @returns New chunks with header + two newlines + original content
+ */
+export function prependHeaderToChunks(chunks: Chunk[], header: string): Chunk[] {
+  if (!header.trim() || chunks.length === 0) {
+    return chunks;
+  }
+  const prefix = `${header}\n\n`;
+  return chunks.map((chunk) => ({
+    ...chunk,
+    content: `${prefix}${chunk.content}`
+  }));
+}
+
+/**
+ * Splits a document into semantically-coherent chunks based on paragraph
+ * boundaries instead of fixed-size windows.
+ *
+ * This implementation uses a simple heuristic:
+ * - Split on blank lines (two or more consecutive newlines)
+ * - Trim whitespace
+ * - Discard empty paragraphs
+ *
+ * The resulting chunks are typically longer than fixed-size windows but
+ * preserve sentence and paragraph structure, which often aligns better
+ * with how humans write and read.
+ *
+ * @param doc - Document to split into semantic paragraphs
+ * @param _cfg - Chunking configuration (currently unused but kept for parity)
+ * @returns Array of semantically-oriented chunks
+ */
+export function semanticChunkDocument(doc: Document, cfg: ChunkingConfig): Chunk[] {
+  const paragraphs = doc.content
+    .split(/\n{2,}/g)
+    .map((p) => p.trim())
+    .filter((p) => p.length > 0);
+
+  const chunks: Chunk[] = [];
+  const maxLen = cfg.chunkSize;
+  const overlap = Math.max(0, Math.min(cfg.chunkOverlap, Math.max(0, maxLen - 1)));
+
+  let idx = 0;
+  for (const paragraph of paragraphs) {
+    if (paragraph.length <= maxLen) {
+      chunks.push({
+        id: `${doc.id}-para-${idx}`,
+        documentId: doc.id,
+        content: paragraph,
+        index: idx,
+        metadata: doc.metadata
+      });
+      idx += 1;
+      continue;
+    }
+
+    // For very long paragraphs, fall back to windowed splitting to stay within model limits.
+    let start = 0;
+    while (start < paragraph.length) {
+      const end = Math.min(start + maxLen, paragraph.length);
+      const content = paragraph.slice(start, end);
+      chunks.push({
+        id: `${doc.id}-para-${idx}`,
+        documentId: doc.id,
+        content,
+        index: idx,
+        metadata: doc.metadata
+      });
+      idx += 1;
+      if (end === paragraph.length) break;
+      start += maxLen - overlap;
+    }
   }
 
   return chunks;

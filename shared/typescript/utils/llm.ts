@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { logger } from "./logging";
+import { RetrievedChunk } from "./types";
 
 /**
  * Interface for generating embeddings from text.
@@ -167,4 +168,74 @@ export class OpenAIChatClient implements ChatClient {
   }
 }
 
+/**
+ * Builds a summarization prompt that asks the model to compress retrieved
+ * context down to only the information needed to answer a question.
+ *
+ * This helper is shared by contextual-compression style projects so they
+ * can reuse a consistent, well-documented prompt.
+ *
+ * @param question - User question
+ * @param chunks - Retrieved chunks providing raw context
+ * @returns Chat messages ready to send to a ChatClient
+ */
+export function buildCompressionMessages(
+  question: string,
+  chunks: RetrievedChunk[]
+): ChatMessage[] {
+  const context = chunks
+    .map((c, idx) => {
+      const source = c.metadata?.title ?? c.documentId;
+      return [`[Chunk ${idx + 1} | ${source} | score=${c.score.toFixed(3)}]`, c.content].join(
+        "\n"
+      );
+    })
+    .join("\n\n");
+
+  const system: ChatMessage = {
+    role: "system",
+    content:
+      "You are a helpful assistant that compresses context for a Retrieval-Augmented Generation (RAG) system.\n" +
+      "Your job is to keep only facts that are directly useful for answering the user's question.\n" +
+      "Do not invent new facts. Prefer short, bullet-style notes over long narrative text."
+  };
+
+  const user: ChatMessage = {
+    role: "user",
+    content: [
+      `Question: ${question.trim()}`,
+      "",
+      "Context chunks:",
+      context,
+      "",
+      "Task: Write a concise, self-contained summary (notes style) that keeps only details needed to answer the question."
+    ].join("\n")
+  };
+
+  return [system, user];
+}
+
+/**
+ * Runs a contextual compression pass over retrieved chunks using a
+ * provided ChatClient. Tests can inject a fake ChatClient to avoid
+ * network calls.
+ *
+ * @param question - User question
+ * @param chunks - Retrieved chunks
+ * @param chatClient - Chat client implementation
+ * @param model - Chat model identifier
+ * @returns Compressed context string
+ */
+export async function compressRetrievedContext(
+  question: string,
+  chunks: RetrievedChunk[],
+  chatClient: ChatClient,
+  model: string
+): Promise<string> {
+  if (chunks.length === 0) {
+    return "";
+  }
+  const messages = buildCompressionMessages(question, chunks);
+  return chatClient.chat(messages, model);
+}
 

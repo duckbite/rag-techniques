@@ -36,12 +36,12 @@ This document tracks parity work as we port the 34 techniques from [`NirDiamant/
 
 | Status | Project Folder | Technique | Source Notebook | Notes / Dependencies |
 | --- | --- | --- | --- | --- |
-| ⏳ | `projects/chunk-headers` | Contextual chunk headers | `all_rag_techniques/contextual_chunk_headers.ipynb` | Introduce document + section metadata prepended to chunks before embedding. |
-| ⏳ | `projects/relevant-segments` | Relevant segment extraction | `all_rag_techniques/relevant_segment_extraction.ipynb` | Post-processing step to stitch adjacent chunks. |
-| ⏳ | `projects/context-window` | Context window enhancement | `all_rag_techniques/context_enrichment_window_around_chunk.ipynb` | Sentence-level embeddings plus neighbor expansion. |
-| ⏳ | `projects/semantic-chunking` | Semantic chunking | `all_rag_techniques/semantic_chunking.ipynb` | NLP-driven segmentation, likely using token-based similarity. |
-| ⏳ | `projects/contextual-compression` | Contextual compression | `all_rag_techniques/contextual_compression.ipynb` | Adds summarization/answer-grading stage before final prompt. |
-| ⏳ | `projects/document-augmentation` | Document augmentation via question generation | `all_rag_techniques/document_augmentation.ipynb` | Generates synthetic Q/A pairs per chunk; depends on ingestion pipeline enhancements. |
+| ✅ | `projects/chunk-headers` | Contextual chunk headers | `all_rag_techniques/contextual_chunk_headers.ipynb` | Prepends document + section metadata to each chunk before embedding using shared header helpers. |
+| ✅ | `projects/relevant-segments` | Relevant segment extraction | `all_rag_techniques/relevant_segment_extraction.ipynb` | Uses shared stitched-segment helper to merge adjacent chunks into longer segments. |
+| ✅ | `projects/context-window` | Context window enhancement | `all_rag_techniques/context_enrichment_window_around_chunk.ipynb` | Expands retrieval into configurable context windows around top chunks. |
+| ✅ | `projects/semantic-chunking` | Semantic chunking | `all_rag_techniques/semantic_chunking.ipynb` | Uses paragraph-based semantic chunking via shared utilities. |
+| ✅ | `projects/contextual-compression` | Contextual compression | `all_rag_techniques/contextual_compression.ipynb` | Runs shared compression helper to summarize/filter retrieved chunks before answering. |
+| ✅ | `projects/document-augmentation` | Document augmentation via question generation | `all_rag_techniques/document_augmentation.ipynb` | Generates synthetic Q/A pairs per chunk during ingestion and stores them alongside base chunks. |
 
 ## Phase 4 — Advanced Retrieval (Jan–Feb 2026)
 

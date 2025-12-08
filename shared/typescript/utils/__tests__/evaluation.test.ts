@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { compareAnswers, scoreRetrieval } from "../evaluation";
+import { compareAnswers, scoreRetrieval, stitchRetrievedChunks } from "../evaluation";
 import { RetrievedChunk } from "../types";
 
 describe("compareAnswers", () => {
@@ -189,3 +189,72 @@ describe("scoreRetrieval", () => {
     expect(score).toBe(0.5); // Only "revenue" found, not "profit"
   });
 });
+
+describe("stitchRetrievedChunks", () => {
+  it("stitches adjacent chunks from same document", () => {
+    const retrieved: RetrievedChunk[] = [
+      {
+        id: "c1",
+        documentId: "doc-1",
+        content: "A",
+        index: 0,
+        score: 0.9
+      },
+      {
+        id: "c2",
+        documentId: "doc-1",
+        content: "B",
+        index: 1,
+        score: 0.8
+      }
+    ];
+    const stitched = stitchRetrievedChunks(retrieved, 10);
+    expect(stitched).toHaveLength(1);
+    expect(stitched[0].content).toContain("A");
+    expect(stitched[0].content).toContain("B");
+    expect(stitched[0].score).toBeCloseTo(0.9);
+  });
+
+  it("respects maxCharsPerSegment", () => {
+    const retrieved: RetrievedChunk[] = [
+      {
+        id: "c1",
+        documentId: "doc-1",
+        content: "AAAAA",
+        index: 0,
+        score: 0.9
+      },
+      {
+        id: "c2",
+        documentId: "doc-1",
+        content: "BBBBB",
+        index: 1,
+        score: 0.8
+      }
+    ];
+    const stitched = stitchRetrievedChunks(retrieved, 7);
+    expect(stitched).toHaveLength(2);
+  });
+
+  it("does not stitch chunks from different documents", () => {
+    const retrieved: RetrievedChunk[] = [
+      {
+        id: "c1",
+        documentId: "doc-1",
+        content: "A",
+        index: 0,
+        score: 0.9
+      },
+      {
+        id: "c2",
+        documentId: "doc-2",
+        content: "B",
+        index: 0,
+        score: 0.8
+      }
+    ];
+    const stitched = stitchRetrievedChunks(retrieved, 10);
+    expect(stitched).toHaveLength(2);
+  });
+});
+

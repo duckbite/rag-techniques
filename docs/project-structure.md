@@ -46,6 +46,30 @@ This document describes the high-level folder layout for the TypeScript RAG Tech
     - `src/vectorStore.ts` – Enhanced vector store supporting multiple embeddings per chunk.
     - `src/ingest.ts` – Enhanced ingestion with question generation and multi-embedding storage.
     - `src/query.ts` – Matches queries against question embeddings.
+  - `chunk-headers/` – Contextual chunk headers.
+    - `config/chunk-headers.config.json` – Standard RAG config plus index path for header-enriched chunks.
+    - `src/ingest.ts` – Wraps baseline chunking and prepends document/section headers to each chunk before embedding.
+    - `src/query.ts` – Standard query CLI that surfaces header-enriched chunks in the prompt.
+  - `relevant-segments/` – Relevant segment extraction.
+    - `config/relevant-segments.config.json` – Standard RAG config plus optional `segmentMaxChars`.
+    - `src/ingest.ts` – Uses the baseline ingestion pipeline.
+    - `src/query.ts` – Stitches adjacent retrieved chunks into longer segments before prompting.
+  - `context-window/` – Context window enhancement.
+    - `config/context-window.config.json` – Standard RAG config plus optional `contextWindowSize`.
+    - `src/ingest.ts` – Uses the baseline ingestion pipeline.
+    - `src/query.ts` – Expands retrieved context into configurable windows around hits.
+  - `semantic-chunking/` – Semantic (paragraph-based) chunking.
+    - `config/semantic-chunking.config.json` – Standard RAG config plus `semanticChunking` flag.
+    - `src/ingest.ts` – Switches between fixed-size and paragraph-based chunks based on config.
+    - `src/query.ts` – Standard query CLI over semantic chunks.
+  - `contextual-compression/` – Contextual compression.
+    - `config/contextual-compression.config.json` – Standard RAG config plus optional `compressionMaxChars`.
+    - `src/ingest.ts` – Uses the baseline ingestion pipeline.
+    - `src/query.ts` – Compresses retrieved chunks with an LLM before answering.
+  - `document-augmentation/` – Document augmentation via Q/A generation.
+    - `config/document-augmentation.config.json` – Standard RAG config plus `questionsPerChunk`.
+    - `src/ingest.ts` – Generates synthetic Q/A pairs per chunk and stores them alongside base chunks.
+    - `src/query.ts` – Standard query CLI that can retrieve both base and augmented Q/A chunks.
 - `logs/`
   - `decision-log.md` – Running record of cross-cutting decisions (runtime data location, documentation requirements, sample data usage, etc.).
 - `shared/`
@@ -56,7 +80,7 @@ This document describes the high-level folder layout for the TypeScript RAG Tech
       - `llm.ts` – LLM and embedding client interfaces + OpenAI implementation.
       - `types.ts` – Core domain types (`Document`, `Chunk`, etc.).
       - `vectorStore.ts` – Simple in-memory vector store and retrieval utilities.
-      - `evaluation.ts` – Simple evaluation helpers (answer comparison, retrieval scoring).
+      - `evaluation.ts` – Simple evaluation helpers (answer comparison, retrieval scoring, stitched segments).
   - `schemas/`
     - `jsonschema/`
       - `config.schema.json` – JSON Schema for per-project config files.

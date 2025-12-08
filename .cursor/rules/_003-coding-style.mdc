@@ -1,0 +1,6 @@
+---
+alwaysApply: true
+---
+
+- The main project contans many subprojects that are used for learning and contain variarions of the same. Keep the subprojects code lean and readable. Please do not use OOP but stick to pure functions in the subprojects that are easy to read and test.
+- The main project contains shared code that can be reused over projects. Please use best practices for object oriented programming in this part of the codebase and export classes that can be reused. 

@@ -10,6 +10,30 @@
     "chatModel": { "type": "string" },
     "dataPath": { "type": "string" },
     "indexPath": { "type": "string" },
+    "contextWindowSize": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Optional context window size (in characters) for window expansion techniques"
+    },
+    "segmentMaxChars": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Optional maximum size (in characters) for stitched relevant segments"
+    },
+    "semanticChunking": {
+      "type": "boolean",
+      "description": "When true, ingestion prefers semantic (paragraph-based) chunking"
+    },
+    "compressionMaxChars": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Optional maximum size (in characters) for compressed context"
+    },
+    "questionsPerChunk": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Optional number of synthetic questions to generate per chunk"
+    },
     "documentTitles": {
       "type": "array",
       "items": { "type": "string" },

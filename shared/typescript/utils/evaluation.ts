@@ -123,4 +123,77 @@ export function scoreRetrieval(
   return matchedKeywords / expectedKeywords.length;
 }
 
+/**
+ * Stitches adjacent retrieved chunks from the same document into longer
+ * segments, up to a maximum character budget per segment.
+ *
+ * This is useful for techniques like relevant segment extraction and
+ * context-window expansion where we want to provide the model with a
+ * slightly larger, contiguous view of the source document instead of
+ * many tiny disjoint chunks.
+ *
+ * The function only has access to the retrieved chunks themselves, so it
+ * stitches together chunks that:
+ * - Belong to the same document
+ * - Have monotonically increasing indices
+ * - Are present in the retrieved set
+ *
+ * @param retrieved - Retrieved chunks sorted by relevance
+ * @param maxCharsPerSegment - Maximum number of characters per stitched segment
+ * @returns New array of stitched chunks (still of type RetrievedChunk)
+ */
+export function stitchRetrievedChunks(
+  retrieved: RetrievedChunk[],
+  maxCharsPerSegment = 800
+): RetrievedChunk[] {
+  if (retrieved.length === 0) {
+    return [];
+  }
+
+  // Group by documentId and sort by index within each group
+  const byDoc = new Map<string, RetrievedChunk[]>();
+  for (const chunk of retrieved) {
+    const group = byDoc.get(chunk.documentId) ?? [];
+    group.push(chunk);
+    byDoc.set(chunk.documentId, group);
+  }
+  for (const group of byDoc.values()) {
+    group.sort((a, b) => a.index - b.index);
+  }
+
+  const stitched: RetrievedChunk[] = [];
+
+  for (const [documentId, group] of byDoc.entries()) {
+    let current: RetrievedChunk | null = null;
+
+    for (const chunk of group) {
+      if (!current) {
+        current = { ...chunk };
+        continue;
+      }
+
+      const sameDoc = chunk.documentId === documentId;
+      const isNextIndex = chunk.index === current.index + 1;
+      const candidateContent: string = `${current.content}\n\n${chunk.content}`;
+
+      if (sameDoc && isNextIndex && candidateContent.length <= maxCharsPerSegment) {
+        current = {
+          ...current,
+          content: candidateContent,
+          // Keep the highest score within the stitched window
+          score: Math.max(current.score, chunk.score)
+        };
+      } else {
+        stitched.push(current);
+        current = { ...chunk };
+      }
+    }
+
+    if (current) {
+      stitched.push(current);
+    }
+  }
+
+  return stitched;
+}
 

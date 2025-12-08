@@ -1,6 +1,16 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { logger } from "../logging";
 
+// Helper to strip ANSI color codes for testing
+function stripAnsiCodes(text: string): string {
+  return text.replace(/\x1b\[[0-9;]*m/g, "");
+}
+
+// Helper to get all log output as a single string
+function getAllLogOutput(calls: unknown[][]): string {
+  return calls.map((c) => String(c[0])).join("\n");
+}
+
 describe("logger", () => {
   let originalEnv: NodeJS.ProcessEnv;
   let consoleLogSpy: ReturnType<typeof vi.spyOn>;
@@ -20,10 +30,10 @@ describe("logger", () => {
     logger.debug("Debug message", { key: "value" });
 
     expect(consoleLogSpy).toHaveBeenCalled();
-    const call = consoleLogSpy.mock.calls[0][0];
-    expect(call).toContain("DEBUG");
-    expect(call).toContain("Debug message");
-    expect(call).toContain('"key": "value"');
+    const output = stripAnsiCodes(getAllLogOutput(consoleLogSpy.mock.calls));
+    expect(output).toContain("DEBUG");
+    expect(output).toContain("Debug message");
+    expect(output).toMatch(/key:\s*value/);
   });
 
   it("should not log debug messages when LOG_LEVEL is info", () => {
@@ -38,9 +48,9 @@ describe("logger", () => {
     logger.info("Info message");
 
     expect(consoleLogSpy).toHaveBeenCalled();
-    const call = consoleLogSpy.mock.calls[0][0];
-    expect(call).toContain("INFO");
-    expect(call).toContain("Info message");
+    const output = stripAnsiCodes(String(consoleLogSpy.mock.calls[0][0]));
+    expect(output).toContain("INFO");
+    expect(output).toContain("Info message");
   });
 
   it("should log warn messages", () => {
@@ -48,10 +58,10 @@ describe("logger", () => {
     logger.warn("Warning message", { error: "test" });
 
     expect(consoleLogSpy).toHaveBeenCalled();
-    const call = consoleLogSpy.mock.calls[0][0];
-    expect(call).toContain("WARN");
-    expect(call).toContain("Warning message");
-    expect(call).toContain('"error": "test"');
+    const output = stripAnsiCodes(getAllLogOutput(consoleLogSpy.mock.calls));
+    expect(output).toContain("WARN");
+    expect(output).toContain("Warning message");
+    expect(output).toMatch(/error:\s*test/);
   });
 
   it("should log error messages", () => {
@@ -59,28 +69,28 @@ describe("logger", () => {
     logger.error("Error message");
 
     expect(consoleLogSpy).toHaveBeenCalled();
-    const call = consoleLogSpy.mock.calls[0][0];
-    expect(call).toContain("ERROR");
-    expect(call).toContain("Error message");
+    const output = stripAnsiCodes(String(consoleLogSpy.mock.calls[0][0]));
+    expect(output).toContain("ERROR");
+    expect(output).toContain("Error message");
   });
 
   it("should include timestamp in log output", () => {
     process.env.LOG_LEVEL = "info";
     logger.info("Test message");
 
-    const call = consoleLogSpy.mock.calls[0][0];
+    const output = stripAnsiCodes(String(consoleLogSpy.mock.calls[0][0]));
     // Timestamp should be at the start in ISO format within brackets
-    expect(call).toMatch(/^\[[0-9]{4}-[0-9]{2}-[0-9]{2}T/);
+    expect(output).toMatch(/^\[[0-9]{4}-[0-9]{2}-[0-9]{2}T/);
   });
 
   it("should not include meta field when not provided", () => {
     process.env.LOG_LEVEL = "info";
     logger.info("Test message");
 
-    const call = consoleLogSpy.mock.calls[0][0];
-    expect(call).toContain("Test message");
+    const output = stripAnsiCodes(String(consoleLogSpy.mock.calls[0][0]));
+    expect(output).toContain("Test message");
     // Should be a single line without a JSON meta block
-    expect(call.split("\n").length).toBe(1);
+    expect(output.split("\n").length).toBe(1);
   });
 
   it("should default to info level when LOG_LEVEL is not set", () => {
@@ -89,9 +99,9 @@ describe("logger", () => {
     logger.info("Info message");
 
     expect(consoleLogSpy).toHaveBeenCalledTimes(1);
-    const call = consoleLogSpy.mock.calls[0][0];
-    expect(call).toContain("INFO");
-    expect(call).toContain("Info message");
+    const output = stripAnsiCodes(String(consoleLogSpy.mock.calls[0][0]));
+    expect(output).toContain("INFO");
+    expect(output).toContain("Info message");
   });
 
   it("should default to info level when LOG_LEVEL is invalid", () => {
@@ -100,9 +110,9 @@ describe("logger", () => {
     logger.info("Info message");
 
     expect(consoleLogSpy).toHaveBeenCalledTimes(1);
-    const call = consoleLogSpy.mock.calls[0][0];
-    expect(call).toContain("INFO");
-    expect(call).toContain("Info message");
+    const output = stripAnsiCodes(String(consoleLogSpy.mock.calls[0][0]));
+    expect(output).toContain("INFO");
+    expect(output).toContain("Info message");
   });
 
   it("should respect log level hierarchy", () => {
@@ -120,8 +130,10 @@ describe("logger", () => {
     logger.error("Colored error");
 
     expect(consoleLogSpy).toHaveBeenCalled();
-    const call = consoleLogSpy.mock.calls[0][0];
-    // Expect ANSI color sequence around ERROR
+    const call = String(consoleLogSpy.mock.calls[0][0]);
+    // Expect ANSI color sequence around ERROR (before stripping)
     expect(call).toMatch(/\x1b\[[0-9;]*mERROR\x1b\[0m/);
+    // But stripped version should still contain ERROR
+    expect(stripAnsiCodes(call)).toContain("ERROR");
   });
 });

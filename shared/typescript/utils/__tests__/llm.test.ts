@@ -1,5 +1,12 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { OpenAIEmbeddingClient, OpenAIChatClient, ChatMessage } from "../llm";
+import {
+  OpenAIEmbeddingClient,
+  OpenAIChatClient,
+  ChatMessage,
+  buildCompressionMessages,
+  compressRetrievedContext
+} from "../llm";
+import { RetrievedChunk } from "../types";
 
 // Use vi.hoisted() to create mock functions that can be accessed in both mock factory and tests
 const { mockEmbeddingsCreate, mockChatCompletionsCreate } = vi.hoisted(() => {
@@ -152,3 +159,54 @@ describe("OpenAIChatClient", () => {
     });
   });
 });
+
+describe("buildCompressionMessages and compressRetrievedContext", () => {
+  it("builds messages that include all chunks", () => {
+    const chunks: RetrievedChunk[] = [
+      {
+        id: "c1",
+        documentId: "doc-1",
+        content: "Text A",
+        index: 0,
+        score: 0.9
+      },
+      {
+        id: "c2",
+        documentId: "doc-2",
+        content: "Text B",
+        index: 0,
+        score: 0.8
+      }
+    ];
+    const messages = buildCompressionMessages("What happened?", chunks);
+    expect(messages).toHaveLength(2);
+    expect(messages[1].content).toContain("Text A");
+    expect(messages[1].content).toContain("Text B");
+  });
+
+  it("compresses context using provided ChatClient", async () => {
+    const fakeChatClient = {
+      chat: vi.fn().mockResolvedValue("compressed context")
+    };
+    const chunks: RetrievedChunk[] = [
+      {
+        id: "c1",
+        documentId: "doc-1",
+        content: "Text A",
+        index: 0,
+        score: 0.9
+      }
+    ];
+
+    const result = await compressRetrievedContext(
+      "What happened?",
+      chunks,
+      fakeChatClient,
+      "gpt-4o-mini"
+    );
+
+    expect(fakeChatClient.chat).toHaveBeenCalled();
+    expect(result).toBe("compressed context");
+  });
+});
+
