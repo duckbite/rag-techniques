@@ -72,6 +72,9 @@ This document describes the high-level folder layout for the TypeScript RAG Tech
     - `src/query.ts` – Standard query CLI that can retrieve both base and augmented Q/A chunks.
 - `logs/`
   - `decision-log.md` – Running record of cross-cutting decisions (runtime data location, documentation requirements, sample data usage, etc.).
+- `tools/`
+  - `scrapers/` – Utility scripts for generating demo datasets.
+    - `booking/` – Booking.com scraper for Den Bosch hotels that produces a typed CSV of hotels and rooms.
 - `shared/`
   - `typescript/`
     - `utils/` – Shared TypeScript utilities:

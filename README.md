@@ -102,6 +102,8 @@ rag-techniques/
 │   ├── typescript/utils/ # Reusable utilities (logging, config, LLM, vector stores)
 │   ├── schemas/          # JSON schemas for config validation
 │   └── assets/data/      # Sample datasets and documents
+├── tools/                # Development tools and data generators
+│   └── scrapers/booking/ # Booking.com scraper that generates demo hotel CSV data
 ├── docs/                 # Documentation
 │   ├── product.md        # Product requirements and roadmap
 │   ├── project-structure.md # Detailed structure documentation

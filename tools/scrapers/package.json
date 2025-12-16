@@ -1,0 +1,21 @@
+{
+  "name": "@tools/scrapers",
+  "version": "0.1.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest watch"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.12",
+    "puppeteer": "^23.7.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/cheerio": "^0.22.35",
+    "vitest": "^4.0.14"
+  }
+}
+
+
