@@ -84,6 +84,7 @@ export function writeBookingCsv(rows: BookingCsvRow[], absolutePath: string): vo
     "roomHighlights",
     "includedFacilities",
     "priceCurrent",
+    "pricePerNight",
     "priceOriginal",
     "currency",
     "priceText",

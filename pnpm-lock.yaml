@@ -40,6 +40,12 @@ importers:
         specifier: ^4.0.14
         version: 4.0.14(@types/node@22.19.1)(yaml@2.8.2)
 
+  projects/booking-demo:
+    devDependencies:
+      vitest:
+        specifier: ^4.0.14
+        version: 4.0.14(@types/node@22.19.1)(yaml@2.8.2)
+
   projects/chunk-headers:
     devDependencies:
       vitest:

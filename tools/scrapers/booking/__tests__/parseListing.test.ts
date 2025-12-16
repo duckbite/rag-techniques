@@ -4,16 +4,12 @@ import { parseListingPage, extractHotelIdFromUrl } from "../parseListing";
 const SAMPLE_LISTING_HTML = `
 <html>
   <body>
-    <div data-testid="property-card">
-      <a data-testid="title-link" href="/hotel/nl/sample-hotel.en-gb.html">
-        <span data-testid="title">Sample Hotel</span>
-      </a>
-      <span data-testid="address">Main Street 1, Den Bosch</span>
-      <div data-testid="review-score">
-        <span>8.7</span>
-        <span>1,234 reviews</span>
-      </div>
-    </div>
+    <li>
+      <a href="/hotel/nl/sample-hotel.en-gb.html">Sample Hotel</a>
+      <a href="/hotel/nl/sample-hotel.en-gb.html?map=1">Den Bosch · Show on map</a>
+      <div>Scored 8.7</div>
+      <div>1,234 reviews</div>
+    </li>
     <a aria-label="Next page" href="/searchresults.html?ss=Den+Bosch&page=2">Next</a>
   </body>
 </html>

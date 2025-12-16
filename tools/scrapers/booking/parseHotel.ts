@@ -28,6 +28,43 @@ function parsePrice(raw: string | undefined | null): number | undefined {
   return Number.isNaN(value) ? undefined : value;
 }
 
+/**
+ * Extract per-night price from priceText.
+ * Looks for patterns like "€ X.XX × N nights" or calculates from total price / nights.
+ */
+function parsePricePerNight(priceText: string | undefined | null, totalPrice: number | undefined): number | undefined {
+  if (!priceText) return undefined;
+
+  // Pattern: "€ 350.60 × 5 nights" - extract the per-night price before the ×
+  const perNightMatch = priceText.match(/€\s*([\d.,]+)\s*×\s*\d+\s*nights?/i);
+  if (perNightMatch) {
+    const perNightStr = perNightMatch[1];
+    return parsePrice(perNightStr);
+  }
+
+  // Pattern: "€ X.XX per night" or "X.XX/night"
+  const perNightPattern = priceText.match(/([\d.,]+)\s*(?:€|EUR)?\s*(?:per|\/)\s*nights?/i);
+  if (perNightPattern) {
+    return parsePrice(perNightPattern[1]);
+  }
+
+  // If we have total price and can find number of nights, calculate per-night
+  const nightsMatch = priceText.match(/(\d+)\s*nights?/i);
+  if (nightsMatch && totalPrice) {
+    const nights = Number.parseInt(nightsMatch[1] ?? "", 10);
+    if (nights > 0 && Number.isFinite(nights)) {
+      return totalPrice / nights;
+    }
+  }
+
+  // If no nights mentioned and we have a total price, assume it's per night
+  if (totalPrice && !nightsMatch) {
+    return totalPrice;
+  }
+
+  return undefined;
+}
+
 function inferCurrency(raw: string | undefined | null): string | undefined {
   if (!raw) return undefined;
   if (raw.includes("€")) return "EUR";
@@ -190,6 +227,7 @@ export function parseHotelRoomsSnapshot(html: string, hotelUrl: string): Room[] 
 
     const priceCurrent = parsePrice(priceCurrentText || priceText);
     const priceOriginal = parsePrice(priceOriginalText);
+    const pricePerNight = parsePricePerNight(priceText, priceCurrent);
     const currency =
       inferCurrency(priceCurrentText || priceOriginalText || priceText) ?? "";
 
@@ -214,6 +252,7 @@ export function parseHotelRoomsSnapshot(html: string, hotelUrl: string): Room[] 
       roomHighlights: roomHighlights || undefined,
       includedFacilities: includedFacilities || undefined,
       priceCurrent,
+      pricePerNight,
       priceOriginal,
       currency: currency || undefined,
       priceText,

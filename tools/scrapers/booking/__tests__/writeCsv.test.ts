@@ -22,20 +22,29 @@ describe("writeBookingCsv", () => {
         hotelId: "sample-hotel.en-gb",
         hotelName: "Sample Hotel",
         hotelAddress: "Main Street 1, Den Bosch",
+        postalCode: "",
+        addressRegion: "",
         city: "Den Bosch",
         country: "Netherlands",
         hotelRating: 8.7,
         reviewCount: 1234,
+        latitude: "",
+        longitude: "",
         hotelUrl: "https://www.booking.com/hotel/nl/sample-hotel.en-gb.html",
+        description: "",
         roomName: "Double Room",
+        maxOccupancyText: "Max. people: 2",
         maxOccupancy: 2,
+        bedTypes: "",
+        roomHighlights: "Free WiFi; Parking",
+        includedFacilities: "",
+        priceCurrent: 129,
         pricePerNight: 129,
+        priceOriginal: "",
         currency: "EUR",
-        breakfastIncluded: true,
-        freeCancellation: true,
-        noPrepaymentNeeded: false,
-        refundable: true,
-        amenitiesSummary: "Free WiFi, Parking",
+        priceText: "€ 129",
+        cancellationPolicy: "Free cancellation",
+        mealPlan: "",
         scrapedAt: "2025-12-16T00:00:00.000Z"
       }
     ];
@@ -54,7 +63,7 @@ describe("writeBookingCsv", () => {
     const row = lines[1];
     expect(row).toContain("sample-hotel.en-gb");
     expect(row).toContain("129");
-    expect(row).toContain("true");
+    expect(row).toContain("Free cancellation");
   });
 });
 

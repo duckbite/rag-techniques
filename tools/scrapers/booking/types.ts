@@ -55,6 +55,8 @@ export interface Room {
   includedFacilities?: string;
   /** Current total price for the stay (numeric, without currency symbol). */
   priceCurrent?: number;
+  /** Per-night price (numeric, without currency symbol). */
+  pricePerNight?: number;
   /** Original/strikethrough price if shown (numeric). */
   priceOriginal?: number;
   /** Three-letter currency code if it can be inferred (e.g. "EUR"). */
@@ -96,6 +98,7 @@ export interface BookingCsvRow {
   roomHighlights: string;
   includedFacilities: string;
   priceCurrent: number | "";
+  pricePerNight: number | "";
   priceOriginal: number | "";
   currency: string;
   priceText: string;

@@ -1,0 +1,10 @@
+{
+  "chunkSize": 1600,
+  "chunkOverlap": 0,
+  "topK": 10,
+  "embeddingModel": "text-embedding-3-small",
+  "chatModel": "gpt-4o-mini",
+  "dataPath": "../../shared/assets/data/booking-data.csv",
+  "indexPath": ".tmp/index/booking-demo.index.json",
+  "documentTitles": []
+}

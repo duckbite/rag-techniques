@@ -14,6 +14,12 @@ This document describes the high-level folder layout for the TypeScript RAG Tech
       - `__tests__/` – Vitest unit tests (e.g., `ingest.test.ts`, `query.test.ts`) covering ingestion/query helpers.
       - `ingest.ts` – Document ingestion pipeline.
       - `query.ts` – Interactive CLI for querying the vector index.
+  - `booking-demo/` – Booking.com-focused demo for Den Bosch (DB-76).
+    - `config/booking-demo.config.json` – Points to `shared/assets/data/booking-data.csv`, sets topK/model defaults, and uses `.tmp/index/booking-demo.index.json`.
+    - `src/ingest.ts` – Converts each CSV row into a single chunk with rich hotel metadata (price, rating, amenities) and filters to Den Bosch.
+    - `src/query.ts` – Re-ranks retrieved hotels by budget/rating/amenities before asking the LLM to summarize a top-5 with rationale; includes interactive CLI prompts.
+    - `src/__tests__/` – Unit tests for ingestion parsing, city filtering, reranking, and prompt building.
+    - `README.md` – Quickstart for ingest/query commands and configuration notes.
   - `csv-rag/` – Structured RAG over CSV files.
     - `config/csv-rag.config.json` – Declares CSV-specific fields (path, text columns, delimiter).
     - `data/company_metrics.csv` – Sample dataset mixing sustainability, finance, and innovation notes.
