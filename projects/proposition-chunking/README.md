@@ -102,6 +102,13 @@ flowchart LR
 
 Other core fields (`chunkSize`, `embeddingModel`, `indexPath`, etc.) behave just like the baseline project.
 
+### Runtime Data Directory (`.tmp/`)
+
+- Generated artifacts (vector indexes) are written to the project-local `.tmp/` directory
+- The directory is committed (via `.gitkeep`) so contributors know where runtime files belong, but contents are ignored via `.gitignore`
+- Deleting `.tmp/` is safe; `pnpm run ingest` will recreate the files
+- The vector index stores proposition chunks with links back to source chunks
+
 ## Usage
 
 ```bash

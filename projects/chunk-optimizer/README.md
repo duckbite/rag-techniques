@@ -62,6 +62,12 @@ The script prints a console table and saves JSON results:
 
 JSON reports live under `.tmp/reports/` so they can be checked into dashboards or notebooks later.
 
+### Runtime Data Directory (`.tmp/`)
+
+- Generated artifacts (benchmark reports) are written to the project-local `.tmp/reports/` directory
+- The directory is committed (via `.gitkeep`) so contributors know where runtime files belong, but contents are ignored via `.gitignore`
+- Deleting `.tmp/` is safe; running the benchmark will recreate the report files
+
 ## How to interpret the benchmark results
 
 Each row in the table (and JSON report) represents **one configuration**:
@@ -123,6 +129,66 @@ pnpm --filter chunk-optimizer test
 ```
 
 Tests ensure invalid combinations are skipped and the benchmarking math behaves as expected.
+
+## Troubleshooting
+
+### "Sample document not found"
+- Ensure `sampleDocPath` in config points to a valid file
+- Path is relative to the config file location or can be absolute
+- Check that the file exists and is readable
+
+### "No results in table"
+- Verify that `chunkSizes` and `chunkOverlaps` arrays in config are not empty
+- Ensure at least one valid combination exists (chunkSize > chunkOverlap)
+- Check that the sample document has content
+
+### Invalid chunk size/overlap combinations
+- The tool automatically skips invalid combinations (e.g., overlap >= chunkSize)
+- Check logs for skipped combinations
+- Ensure `chunkSize > chunkOverlap` for all combinations you want to test
+
+### Results don't match expectations
+- The tool measures structural properties, not retrieval quality
+- To see how chunking affects actual retrieval, use the chosen parameters in a RAG project (e.g., basic-rag)
+- Run validation scenarios in the RAG project to verify quality
+
+### JSON report not generated
+- Check that `.tmp/reports/` directory exists (created automatically)
+- Verify write permissions for the report file
+- Check logs for any errors during report generation
+
+## Troubleshooting
+
+### "Sample document not found"
+- Ensure `sampleDocPath` in config points to a valid file
+- Path is relative to the config file location or can be absolute
+- Check that the file exists and is readable
+
+### "No results in table"
+- Verify that `chunkSizes` and `chunkOverlaps` arrays in config are not empty
+- Ensure at least one valid combination exists (chunkSize > chunkOverlap)
+- Check that the sample document has content
+
+### Invalid chunk size/overlap combinations
+- The tool automatically skips invalid combinations (e.g., overlap >= chunkSize)
+- Check logs for skipped combinations
+- Ensure `chunkSize > chunkOverlap` for all combinations you want to test
+
+### Results don't match expectations
+- The tool measures structural properties, not retrieval quality
+- To see how chunking affects actual retrieval, use the chosen parameters in a RAG project (e.g., basic-rag)
+- Run validation scenarios in the RAG project to verify quality
+
+### JSON report not generated
+- Check that `.tmp/reports/` directory exists (created automatically)
+- Verify write permissions for the report file
+- Check logs for any errors during report generation
+
+### Runtime Data Directory (`.tmp/`)
+
+- Generated artifacts (benchmark reports) are written to the project-local `.tmp/reports/` directory
+- The directory is committed (via `.gitkeep`) so contributors know where runtime files belong, but contents are ignored via `.gitignore`
+- Deleting `.tmp/` is safe; running the benchmark will recreate the report files
 
 ## Next ideas
 

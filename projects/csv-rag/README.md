@@ -117,6 +117,12 @@ Example (shipped in this repo):
 
 The default configuration uses `shared/assets/data/unicorn_companies_metrics.csv`. You can modify `csvPath` in the config to use your own CSV file. The CSV must contain a header row with column names.
 
+### Runtime Data Directory (`.tmp/`)
+
+- Generated artifacts (vector indexes) are written to the project-local `.tmp/` directory
+- The directory is committed (via `.gitkeep`) so contributors know where runtime files belong, but contents are ignored via `.gitignore`
+- Deleting `.tmp/` is safe; `pnpm run ingest` will recreate the files
+
 ## Setup
 
 From the repository root:

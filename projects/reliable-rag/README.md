@@ -95,6 +95,12 @@ flowchart LR
 | `relevanceThreshold` | Minimum cosine similarity required for a chunk to be considered validated. |
 | `highlightWindow` | Number of characters to capture around the first matching keyword for display. Larger values show more context. |
 
+### Runtime Data Directory (`.tmp/`)
+
+- Generated artifacts (vector indexes) are written to the project-local `.tmp/` directory
+- The directory is committed (via `.gitkeep`) so contributors know where runtime files belong, but contents are ignored via `.gitignore`
+- Deleting `.tmp/` is safe; `pnpm run ingest` will recreate the files
+
 Example:
 
 ```json
